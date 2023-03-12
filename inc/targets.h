@@ -15,6 +15,7 @@
 //#define AIKON_SINGLE_F421
 //#define AIKON_55A_F421
 //#define WRAITH32_F421
+#define HAKRC_K_F421
 
 #endif
 
