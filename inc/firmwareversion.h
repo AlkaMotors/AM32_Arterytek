@@ -1,1 +1,1 @@
-extern const char test[14];
+extern const char test[30];

@@ -31,6 +31,8 @@ const char gcr_encode_table[16] = { 0b11001,
 		0b01111
 };
 
+char EDT_ARM_ENABLE =0;
+char EDT_ARMED = 0;
 int shift_amount = 0;
 uint32_t gcrnumber;
 extern int e_com_time;
@@ -49,31 +51,41 @@ uint16_t dshot_goodcounts;
 uint16_t dshot_badcounts;
 char dshot_extended_telemetry = 0;
 uint16_t send_extended_dshot = 0;
+uint16_t halfpulsetime = 0;
+
 
 void computeDshotDMA(){
 
 
 int j = 0;
 dshot_frametime = dma_buffer[31]- dma_buffer[0];
+//UTILITY_TIMER->c1dt = dshot_frametime;
+halfpulsetime = (dshot_frametime >> 5) + (dshot_frametime >> 8);
+if((dshot_frametime < 500)&&(dshot_frametime > 300)){
+for (int i = 0; i < 16; i++){
+	dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) > (halfpulsetime)) ;
+}	
+	
+	
+	
+//#if defined MCU_AT421
 
-#if defined MCU_AT421
+//				if((dshot_frametime < 3500)&&(dshot_frametime > 2800)){
+//								
+//				for (int i = 0; i < 16; i++){
+//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 100) ;
+//					
+//				}
+//#endif
+//#if defined MCU_AT415
 
-				if((dshot_frametime < 3500)&&(dshot_frametime > 2800)){
-								
-				for (int i = 0; i < 16; i++){
-					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 100) ;
-					
-				}
-#endif
-#if defined MCU_AT415
-
-				if((dshot_frametime < 5000)&&(dshot_frametime > 3000)){
-						
-				for (int i = 0; i < 16; i++){
-					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 120) ;
-					
-				}
-#endif
+//				if((dshot_frametime < 5000)&&(dshot_frametime > 3000)){
+//						
+//				for (int i = 0; i < 16; i++){
+//					dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) / 120) ;
+//					
+//				}
+//#endif
 				uint8_t calcCRC = ((dpulse[0]^dpulse[4]^dpulse[8])<<3
 						|(dpulse[1]^dpulse[5]^dpulse[9])<<2
 						|(dpulse[2]^dpulse[6]^dpulse[10])<<1
@@ -107,12 +119,12 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
                     send_telemetry=1;
 					}
 					if (tocheck > 47){
-
-
+						if(EDT_ARMED){
 						newinput = tocheck;
-	                    dshotcommand = 0;
-	                    command_count = 0;
-	                    return;
+	          dshotcommand = 0;
+	          command_count = 0;
+	          return;
+						}
 					}
 
 				if ((tocheck <= 47)&& (tocheck > 0)){
@@ -120,6 +132,9 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 					dshotcommand = tocheck;    //  todo
 				}
 				if (tocheck == 0){
+					if(EDT_ARM_ENABLE == 1){
+					EDT_ARMED = 0;
+					}
 					newinput = 0;
 					dshotcommand = 0;
 					command_count = 0;
@@ -175,12 +190,14 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 										case 13:
 					dshot_extended_telemetry = 1;
 					send_extended_dshot = 0b111000000000;
-					make_dshot_package();
+					if(EDT_ARM_ENABLE == 1){
+					EDT_ARMED = 1;
+					}
 					break;
 					case 14:
 					dshot_extended_telemetry = 0;
 					send_extended_dshot = 0b111011111111;
-					make_dshot_package();
+			//		make_dshot_package();
 					break;
 					case 20:
 						forward = 1 - dir_reversed;
@@ -197,8 +214,10 @@ dshot_frametime = dma_buffer[31]- dma_buffer[0];
 				}else{
 					dshot_badcounts++;
 				}
-
-		}
+			}else{
+				dshot_badcounts++;
+			}
+	//	UTILITY_TIMER->c1dt = dshot_badcounts;
 }
 
 
@@ -258,5 +277,5 @@ for (int i = 15; i >= 9 ; i--){
 		  }
           gcr[3] = 0;
 #endif
-
+		
 }

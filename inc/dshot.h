@@ -13,7 +13,8 @@
 
 
 
-
+extern char EDT_ARM_ENABLE;
+extern char EDT_ARMED;
 void computeDshotDMA(void);
 void make_dshot_package();
 

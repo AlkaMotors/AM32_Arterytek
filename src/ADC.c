@@ -6,13 +6,18 @@
  */
 #include "ADC.h"
 #include "functions.h"
+
 #ifdef USE_ADC
+
+#ifdef PA6_NTC_ONLY 
+uint16_t ADCDataDMA[1];
+#else
 #ifdef USE_ADC_INPUT
 uint16_t ADCDataDMA[4];
 #else
 uint16_t ADCDataDMA[3];
 #endif
-
+#endif
 
 extern uint16_t ADC_raw_temp;
 extern uint16_t ADC_raw_volts;
@@ -20,14 +25,14 @@ extern uint16_t ADC_raw_current;
 extern uint16_t ADC_raw_input;
 
 void ADC_DMA_Callback(){  // read dma buffer and set extern variables
-
+#ifdef PA6_NTC_ONLY 
+	ADC_raw_temp = ADCDataDMA[0];
+#else	
 #ifdef USE_ADC_INPUT
 	ADC_raw_temp =    ADCDataDMA[3];
 	ADC_raw_volts  = ADCDataDMA[1]/2;
 	ADC_raw_current =ADCDataDMA[2];
 	ADC_raw_input = ADCDataDMA[0];
-
-
 #else
 ADC_raw_temp =    ADCDataDMA[2];
 #ifdef PA6_VOLTAGE
@@ -36,6 +41,7 @@ ADC_raw_current =ADCDataDMA[0];
 #else
 ADC_raw_volts  = ADCDataDMA[0];
 ADC_raw_current =ADCDataDMA[1];
+#endif
 #endif
 #endif
 }
@@ -48,8 +54,12 @@ void ADC_Init(void)
   nvic_irq_enable(DMA1_Channel1_IRQn, 2, 0);
   dma_reset(DMA1_CHANNEL1);
   dma_default_para_init(&dma_init_struct);
+#ifdef PA6_NTC_ONLY 
+	dma_init_struct.buffer_size = 1;
+#else
   dma_init_struct.buffer_size = 3;
-  dma_init_struct.direction = DMA_DIR_PERIPHERAL_TO_MEMORY;
+#endif  
+	dma_init_struct.direction = DMA_DIR_PERIPHERAL_TO_MEMORY;
   dma_init_struct.memory_base_addr = (uint32_t)&ADCDataDMA;
   dma_init_struct.memory_data_width = DMA_MEMORY_DATA_WIDTH_HALFWORD;
   dma_init_struct.memory_inc_enable = TRUE;
@@ -71,14 +81,17 @@ void ADC_Init(void)
   adc_base_struct.sequence_mode = TRUE;
   adc_base_struct.repeat_mode = TRUE;
   adc_base_struct.data_align = ADC_RIGHT_ALIGNMENT;
-  adc_base_struct.ordinary_channel_length = 3;
+#ifdef PA6_NTC_ONLY 
+adc_base_struct.ordinary_channel_length = 1;
+   adc_base_config(ADC1, &adc_base_struct);
+   adc_ordinary_channel_set(ADC1, ADC_CHANNEL_6, 1, ADC_SAMPLETIME_28_5);
+#else
+adc_base_struct.ordinary_channel_length = 3;
   adc_base_config(ADC1, &adc_base_struct);
-  
-	
-	adc_ordinary_channel_set(ADC1, ADC_CHANNEL_4, 1, ADC_SAMPLETIME_28_5);
-  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_5, 2, ADC_SAMPLETIME_28_5);
+  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_3, 1, ADC_SAMPLETIME_28_5);
+  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_6, 2, ADC_SAMPLETIME_28_5);
   adc_ordinary_channel_set(ADC1, ADC_CHANNEL_16, 3, ADC_SAMPLETIME_28_5);
-  
+#endif   
 	adc_tempersensor_vintrv_enable(TRUE);
 	adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);
   

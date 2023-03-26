@@ -151,7 +151,12 @@
 			-fix drive by rpm mode
 *1.91 -reset average interval on any desync after 100 zero crosses 
 *1.92 - increase ADC read rate and filtering
-*1.93 - Add filename to fixed location in flash memory
+*1.93 -Add filename to fixed location in flash memory
+			-Adjusted polling mode thresholds
+			-Fixed low battery-cutoff engaging too fast
+*1.94 - increased timout to 2.5seconds when not running
+			- add selectable input signal type instead of auto 
+			
  */	     
 
 
@@ -187,7 +192,7 @@
 uint16_t comp_change_time = 0;
 
 #define VERSION_MAJOR 1
-#define VERSION_MINOR 93
+#define VERSION_MINOR 95
 
 //firmware build options !! fixed speed and duty cycle modes are not to be used with sinusoidal startup !!
 
@@ -235,7 +240,13 @@ uint32_t MINIMUM_RPM_SPEED_CONTROL = 2000;
 
 uint16_t target_e_com_time_high;
 uint16_t target_e_com_time_low;
-
+ enum inputType{
+	 AUTO_IN,
+	 DSHOT_IN,
+	 SERVO_IN,
+	 SERIAL_IN,
+	 EDTARM,
+ };
 char eeprom_layout_version = 2;
 char dir_reversed = 0;
 char comp_pwm = 1;
@@ -430,7 +441,7 @@ uint8_t changeover_step = 5;
 uint8_t filter_level = 5;
 uint8_t running = 0;
 uint16_t advance = 0;
-uint8_t advancedivisor = 4;
+uint8_t advancedivisor = 6;
 char rising = 1;
 
 
@@ -501,6 +512,7 @@ uint16_t e_rpm;      // electrical revolution /100 so,  123 is 12300 erpm
 uint16_t adjusted_duty_cycle;
 
 uint8_t bad_count = 0;
+uint8_t bad_count_threshold = CPU_FREQUENCY_MHZ / 24;
 uint8_t dshotcommand;
 uint16_t armed_count_threshold = 1000;
 
@@ -517,6 +529,7 @@ uint32_t zero_crosses;
 uint8_t zcfound = 0;
 
 uint8_t bemfcounter;
+
 uint8_t min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS;
 uint8_t min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS;
 
@@ -727,10 +740,40 @@ void loadEEpromSettings(){
 	   if(eepromBuffer[45] > 0 && eepromBuffer[45] < 11){ 
 	   sine_mode_power = eepromBuffer[45];
 	   }
-
+	   if(eepromBuffer[46] >= 0 && eepromBuffer[46] < 10){
+		   switch (eepromBuffer[46]){
+		   case AUTO_IN:
+			   dshot= 0;
+			   servoPwm = 0;
+			   EDT_ARMED = 1;
+			   break;
+		   case DSHOT_IN:
+			   dshot = 1;
+			   EDT_ARMED = 1;
+			   break;
+		   case SERVO_IN:
+			   servoPwm = 1;
+			   break;
+		   case SERIAL_IN:
+			   break;
+		   case EDTARM:
+			   EDT_ARM_ENABLE = 1;
+			   EDT_ARMED = 0;
+			   dshot = 1;
+			   break;
+		   };
+	   }else{
+		   dshot = 0;
+		   servoPwm = 0;
+		   EDT_ARMED = 1;
+	   }
        if(motor_kv < 300){
 		   low_rpm_throttle_limit = 0;
 	   }
+		if((motor_kv < 1500)|| (stall_protection)){
+			min_bemf_counts_up = TARGET_MIN_BEMF_COUNTS *2;
+			min_bemf_counts_down = TARGET_MIN_BEMF_COUNTS *2;
+		}
 	   low_rpm_level  = motor_kv / 100 / (32 / motor_poles);
 	   high_rpm_level = motor_kv / 17 / (32/motor_poles);
 	   }
@@ -809,7 +852,7 @@ void getBemfState(){
     		bemfcounter++;
     		}else{
     		bad_count++;
-    		if(bad_count > 2){
+    		if(bad_count > bad_count_threshold){
     		bemfcounter = 0;
     		}
    	}
@@ -818,7 +861,7 @@ void getBemfState(){
     		bemfcounter++;
     	}else{
     		bad_count++;
-    	    if(bad_count > 2){
+    	    if(bad_count > bad_count_threshold){
     	    bemfcounter = 0;
     	  }
     	}
@@ -1259,7 +1302,7 @@ if(send_telemetry){
 	  
 		signaltimeout++;
 	
-		if(signaltimeout > 2500 * (servoPwm+1)) { // quarter second timeout when armed half second for servo;
+		if(signaltimeout > 5000) { // quarter second timeout when armed half second for servo;
 			if(armed){
 				allOff();
 				armed = 0;
@@ -1295,7 +1338,7 @@ if(send_telemetry){
 			for(int i = 0; i < 64; i++){
 				dma_buffer[i] = 0;
 			}
-			NVIC_SystemReset();
+      NVIC_SystemReset();
 		}
 			}
 #endif
@@ -1348,8 +1391,8 @@ void zcfoundroutine(){   // only used in polling mode, blocking routine.
 	commutation_interval = (thiszctime + (3*commutation_interval)) / 4;
 	advance = commutation_interval / advancedivisor;
 	waitTime = commutation_interval /2  - advance;
-	while (INTERVAL_TIMER->cval < waitTime - advance){
-
+	while (INTERVAL_TIMER->cval < waitTime){
+//if(zero_crosses < 10){break;}
 	}
 	commutate();
     bemfcounter = 0;
@@ -1425,13 +1468,7 @@ adc_counter = 5;
    ADC_Init();
 #endif
 
-#ifdef USE_ADC_INPUT
 
-#else
-tmr_channel_enable(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, TRUE);
-IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
-
-#endif
 
 adc_counter = 6;
 loadEEpromSettings();
@@ -1501,7 +1538,7 @@ adc_counter = 7;
 	 	use_sin_start = 0;
 		playBrushedStartupTune();
 #else
-	 //  playStartupTune();
+	//   playStartupTune();
 #endif
 	   zero_input_count = 0;
 	   MX_IWDG_Init();
@@ -1519,9 +1556,19 @@ adc_counter = 7;
 #else
 adc_counter = 8;
 
+
+
 UN_TIM_Init();
+#ifdef USE_ADC_INPUT
+
+#else
+tmr_channel_enable(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, TRUE);
+IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
+
+#endif
+
 receiveDshotDma();
- 
+
 if(drive_by_rpm){
 	 use_speed_control_loop = 1;
  }
@@ -1537,22 +1584,23 @@ adc_counter = 9;
 WDT->cmd = WDT_CMD_RELOAD;
 
 	  adc_counter++;
-	  if(adc_counter>200){   // for testing adc and telemetry
+	  if(adc_counter>20){   // for testing adc and telemetry
 
 					ADC_raw_temp = ADC_raw_temp - (temperature_offset);
 					converted_degrees =(12600 - (int32_t)ADC_raw_temp * 33000 / 4096) / -42 + 25;
 					degrees_celsius =(7 * degrees_celsius + converted_degrees) >> 3;
           battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER)/100)) >> 3;
-          smoothed_raw_current = ((7*smoothed_raw_current + (ADC_raw_current) )>> 3);
-          actual_current = (smoothed_raw_current * 3300/41) / (MILLIVOLT_PER_AMP)  + CURRENT_OFFSET;
+          smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
+          actual_current = ((smoothed_raw_current * 3300/41) - (CURRENT_OFFSET*100))/ (MILLIVOLT_PER_AMP);
+		      if(actual_current < 0){actual_current = 0;}     
 
-			adc_ordinary_software_trigger_enable(ADC1, TRUE);
-			
+			    adc_ordinary_software_trigger_enable(ADC1, TRUE);
+			UTILITY_TIMER->c1dt = degrees_celsius;
 
 		  if(LOW_VOLTAGE_CUTOFF){
 			  if(battery_voltage < (cell_count * low_cell_volt_cutoff)){
 				  low_voltage_count++;
-				  if(low_voltage_count > (1000 - (stepper_sine * 900))){
+				  if(low_voltage_count > (20000 - (stepper_sine * 900))){
 				  input = 0;
 				  allOff();
 				  maskPhaseInterrupts();
@@ -1846,7 +1894,7 @@ if (old_routine && running){
 	 		  }
 	 	  }
 }
-	 	  if (INTERVAL_TIMER->cval > 45000 && running == 1){
+	 	  if (INTERVAL_TIMER->cval > 50000 && running == 1){
               bemf_timeout_happened ++;
 
 	 		  maskPhaseInterrupts();
@@ -1898,7 +1946,7 @@ if(input > 48 && armed){
 	 			 maskPhaseInterrupts();
 	 			 allpwm();
 	 		 advanceincrement();
-             step_delay = map (input, 48, 120, 7000/motor_poles, 810/motor_poles);
+             step_delay = map (input, 48, 120, 7000/motor_poles, 1000/motor_poles);
 	 		 delayMicros(step_delay);
 			 e_rpm =   600/ step_delay ;         // in hundreds so 33 e_rpm is 3300 actual erpm
 				if(step_delay < 181){
@@ -1962,7 +2010,7 @@ TMR1->c3dt = 0;
 #endif    // end of brushless mode
 
 #ifdef BRUSHED_MODE
-
+          TMR14->c1dt = adjusted_input;
 	  			if(brushed_direction_set == 0 && adjusted_input > 48){
 	  				if(forward){
 	  					allOff();
@@ -1983,7 +2031,7 @@ TMR1->c3dt = 0;
 	  			if(input > 0 && armed){
 	  				TMR1->c1dt = input;												// set duty cycle to 50 out of 768 to start.
 	  				TMR1->c2dt = input;
-	  				TMR1->cdt = input;
+	  				TMR1->c3dt = input;
 	  			}else{
 	  				TMR1->c1dt = 0;												// set duty cycle to 50 out of 768 to start.
 	  				TMR1->c2dt = 0;

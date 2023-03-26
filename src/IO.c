@@ -12,7 +12,7 @@
 #include "functions.h"
 #include "common.h"
 
-char ic_timer_prescaler = 16;
+char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 8 - 1;
 char output_timer_prescaler;
 int buffersize = 32;
 int smallestnumber = 0;
@@ -82,15 +82,62 @@ gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 }
 
 
+
+
+
+
+	
+void checkDshot(){
+		if ((smallestnumber >= 0)&&(smallestnumber < 2)&& (average_signal_pulse < 3)) {
+		ic_timer_prescaler= 1;
+		output_timer_prescaler=0;
+		dshot = 1;
+		buffer_divider = 44;
+		dshot_runout_timer = 65000;
+		buffersize = 32;
+	}
+	if ((smallestnumber >= 2)&&(smallestnumber < 4)&& (average_signal_pulse < 4)) {
+			ic_timer_prescaler= 3;
+			output_timer_prescaler=0;
+			dshot = 1;
+			buffersize = 32;
+		}
+	
+
+	if ((smallestnumber >= 4)&&(smallestnumber < 6)&& (average_signal_pulse < 8)) {
+		ic_timer_prescaler= 7;
+		output_timer_prescaler=1;
+		dshot = 1;
+		buffersize = 32;
+		inputSet = 1;
+	}
+	if ((smallestnumber >= 8 )&&(smallestnumber < 10)&& (average_signal_pulse < 20)){
+		dshot = 1;
+		ic_timer_prescaler=15;
+		output_timer_prescaler=3;
+//		IC_TIMER_REGISTER->CNT = 0xffff;
+		buffersize = 32;
+		inputSet = 1;
+	}
+}
+void checkServo(){
+		if (smallestnumber > 300 && smallestnumber < 20000){
+			servoPwm = 1;
+			ic_timer_prescaler=CPU_FREQUENCY_MHZ - 1;
+			armed_count_threshold = 35;
+			buffersize = 2;
+			inputSet = 1;
+		}
+
+
+//	UTILITY_TIMER->c1dt = average_signal_pulse;
+}
+
+
 void detectInput(){
 	smallestnumber = 20000;
 	average_signal_pulse = 0;
-	dshot = 0;
-	servoPwm = 0;
 	int lastnumber = dma_buffer[0];
-
-
-
 
 	for ( int j = 1 ; j < 31; j++){
 		if(dma_buffer[j] - lastnumber > 0 ){
@@ -105,79 +152,17 @@ void detectInput(){
 		lastnumber = dma_buffer[j];
 	}
 	average_signal_pulse = average_signal_pulse/32 ;
-#ifdef MCU_AT415
-	if ((smallestnumber > 1)&&(smallestnumber <= 5)&& (average_signal_pulse < 70)) {
-#endif			
-#ifdef MCU_AT421		
-	if ((smallestnumber > 1)&&(smallestnumber <= 4)&& (average_signal_pulse < 60)) {
-#endif		
-		ic_timer_prescaler= 0;
-		output_timer_prescaler=1;
-		dshot = 1;
-		buffer_divider = 44;
-		dshot_runout_timer = 65000;
-		armed_count_threshold = 10000;
-		buffersize = 32;
-	}
-#ifdef MCU_AT415
-    if ((smallestnumber > 5 )&&(smallestnumber <= 10)&& (average_signal_pulse < 100)){
-#endif	
-#ifdef MCU_AT421
-	if ((smallestnumber > 4 )&&(smallestnumber <= 8)&& (average_signal_pulse < 100)){
-#endif		
-		dshot = 1;
-		ic_timer_prescaler=1;
-		output_timer_prescaler=3;
-		IC_TIMER_REGISTER->cval = 0xffff;
-		buffer_divider = 44;
-		dshot_runout_timer = 65000;
-		armed_count_threshold = 10000;
-		buffersize = 32;
-	}
-//	if ((smallestnumber > 100 )&&(smallestnumber < 400)){
-//		multishot = 1;
-//		armed_count_threshold = 1000;
-//		buffersize = 4;
-//	}
-//	if ((smallestnumber > 2000 )&&(smallestnumber < 3000)){
-//		oneshot42 = 1;
-//	}
-		if (smallestnumber > 30 && smallestnumber < 20000){
-			servoPwm = 1;
-			ic_timer_prescaler=119;
-			armed_count_threshold = 35;
-			buffersize = 2;
-		}
-
-	if (smallestnumber == 0 || smallestnumber == 20000){
-		inputSet = 0;
-	}else{
-
-		inputSet = 1;
-	}
-	UTILITY_TIMER->c1dt = smallestnumber;
+	
+if(dshot == 1){
+ checkDshot();
+}
+if(servoPwm == 1){
+ checkServo();
 }
 
+if(!dshot && !servoPwm){
+	checkDshot();
+	checkServo();
+}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+}
