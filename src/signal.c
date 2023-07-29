@@ -108,14 +108,11 @@ void computeServoInput(){
 void transfercomplete(){
 	if(armed && dshot_telemetry){
 	    if(out_put){
-
-
-	  	receiveDshotDma();
+			receiveDshotDma();
+			make_dshot_package();	
 	   	return;
 	    }else{
-
 			sendDshotDma();
-			make_dshot_package();
 			computeDshotDMA();
 	    return;
 	    }
@@ -152,22 +149,15 @@ if(dshot_telemetry){
 			receiveDshotDma();
 		}
 		if  (servoPwm == 1){
+            while(INPUT_PIN_PORT->idt & INPUT_PIN){
+			}
 				 if(!((INPUT_PIN_PORT->idt & INPUT_PIN))){  // if the pin is low 
 	 
 			computeServoInput();
-				 }
-		//	LL_TIM_IC_SetPolarity(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, LL_TIM_IC_POLARITY_RISING); // setup rising pin trigger.
-      //TIMER_CHCTL2(IC_TIMER_REGISTER) |= (uint32_t)(TIMER_IC_POLARITY_RISING);
-		//	IC_TIMER_REGISTER->CTRL2 |= TMR_ICPolarity_Rising;
-			  
+			}	  
         IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_RISING_EDGE;
-			
-			
    		receiveDshotDma();
-    // 	LL_DMA_EnableIT_HT(DMA1, INPUT_DMA_CHANNEL);
-	//		DMA_CHCTL(INPUT_DMA_CHANNEL) |= DMA_INT_HTF;
-		//	INPUT_DMA_CHANNEL->CHCTRL |= DMA_INT_HT;
-			INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
+		INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
 		}
 
 	}

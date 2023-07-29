@@ -21,6 +21,7 @@ char out_put = 0;
 char buffer_divider = 44;
 int dshot_runout_timer = 62500;
 uint32_t average_signal_pulse;
+uint8_t buffer_padding = 7;
 
 void changeToOutput(){
 	INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_MEMORY_TO_PERIPHERAL;
@@ -36,12 +37,11 @@ void changeToOutput(){
 
 void changeToInput(){
 #ifdef MCU_AT415
-gpio_mode_QUICK(GPIOB, GPIO_MODE_INPUT, GPIO_PULL_NONE, INPUT_PIN);
+gpio_mode_QUICK(GPIOB, GPIO_MODE_INPUT, GPIO_PULL_UP, INPUT_PIN);
 #endif
 	INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_PERIPHERAL_TO_MEMORY;
-
 	tmr_reset(IC_TIMER_REGISTER);
-	IC_TIMER_REGISTER->cm1 = 0x1;
+	IC_TIMER_REGISTER->cm1 = 0x6001;
 	IC_TIMER_REGISTER->cctrl = 0xB;
 	IC_TIMER_REGISTER->div = ic_timer_prescaler;
 	IC_TIMER_REGISTER->pr = 0xFFFF;
@@ -69,7 +69,7 @@ void sendDshotDma(){
 	
 	INPUT_DMA_CHANNEL->paddr = (uint32_t)&IC_TIMER_REGISTER->c1dt;
 	INPUT_DMA_CHANNEL->maddr = (uint32_t)&gcr;
-	INPUT_DMA_CHANNEL->dtcnt = 26;
+	INPUT_DMA_CHANNEL->dtcnt = 23 + buffer_padding;
 	INPUT_DMA_CHANNEL->ctrl |= DMA_FDT_INT;
 	INPUT_DMA_CHANNEL->ctrl |= DMA_DTERR_INT;
 	INPUT_DMA_CHANNEL->ctrl_bit.chen = TRUE;
@@ -80,12 +80,6 @@ void sendDshotDma(){
 gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 #endif
 }
-
-
-
-
-
-
 	
 void checkDshot(){
 		if ((smallestnumber >= 0)&&(smallestnumber < 2)&& (average_signal_pulse < 3)) {
@@ -108,6 +102,7 @@ void checkDshot(){
 		ic_timer_prescaler= 7;
 		output_timer_prescaler=1;
 		dshot = 1;
+		buffer_padding = 18;
 		buffersize = 32;
 		inputSet = 1;
 	}
@@ -115,7 +110,7 @@ void checkDshot(){
 		dshot = 1;
 		ic_timer_prescaler=15;
 		output_timer_prescaler=3;
-//		IC_TIMER_REGISTER->CNT = 0xffff;
+        buffer_padding = 9;
 		buffersize = 32;
 		inputSet = 1;
 	}

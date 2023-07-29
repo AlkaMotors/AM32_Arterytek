@@ -10,7 +10,7 @@
 
 
 void maskPhaseInterrupts(){
-	 EXINT->inten &= ~EXTI_LINE;
+	EXINT->inten &= ~EXTI_LINE;
 	EXINT->intsts = EXTI_LINE;
 }
 
@@ -46,7 +46,7 @@ if (step == 1 || step == 4)
 	}
 	if (step == 3 || step == 6)
 	{   // b floating
-		CMP->ctrlsts = PHASE_B_COMP;
+		CMP->ctrlsts = PHASE_B_COMP;	
 	}
 #endif	
 	if (rising)

@@ -6,6 +6,7 @@
  */
 #include "ADC.h"
 #include "functions.h"
+#include "targets.h"
 
 #ifdef USE_ADC
 
@@ -48,7 +49,7 @@ ADC_raw_current =ADCDataDMA[1];
 
 void ADC_Init(void)
 {
-
+  gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_6);
   dma_init_type dma_init_struct;
   crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
   nvic_irq_enable(DMA1_Channel1_IRQn, 2, 0);
@@ -88,9 +89,9 @@ adc_base_struct.ordinary_channel_length = 1;
 #else
 adc_base_struct.ordinary_channel_length = 3;
   adc_base_config(ADC1, &adc_base_struct);
-  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_3, 1, ADC_SAMPLETIME_28_5);
-  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_6, 2, ADC_SAMPLETIME_28_5);
-  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_16, 3, ADC_SAMPLETIME_28_5);
+  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_VOLTAGE, 1, ADC_SAMPLETIME_28_5);
+  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_CURRENT, 2, ADC_SAMPLETIME_28_5);
+  adc_ordinary_channel_set(ADC1, ADC_CHANNEL_TEMP, 3, ADC_SAMPLETIME_28_5);
 #endif   
 	adc_tempersensor_vintrv_enable(TRUE);
 	adc_ordinary_conversion_trigger_set(ADC1, ADC12_ORDINARY_TRIG_SOFTWARE, TRUE);

@@ -156,7 +156,14 @@
 			-Fixed low battery-cutoff engaging too fast
 *1.94 - increased timout to 2.5seconds when not running
 			- add selectable input signal type instead of auto 
-			
+*1.95  - reduce timeout to 0.5 seconds when armed
+*1.96  - Improved erpm accuracy dshot and serial telemetry, thanks Dj-Uran
+	     - Fix PID loop integral.	
+		 - add overcurrent low voltage cuttoff to brushed mode.
+*1.97    - enable input pullup 
+*1.98    - Dshot erpm rounding compensation. 	
+*1.99    -Dshot timing fixes, input capture filter
+*2.00    -Cleanup of target structure
  */	     
 
 
@@ -189,15 +196,19 @@
 #include "common.h"
 #include "firmwareversion.h"
 
+#ifdef USE_WS2812
+#include "WS2812.h"
+#endif
+
 uint16_t comp_change_time = 0;
 
-#define VERSION_MAJOR 1
-#define VERSION_MINOR 95
+#define VERSION_MAJOR 2
+#define VERSION_MINOR 00
 
 //firmware build options !! fixed speed and duty cycle modes are not to be used with sinusoidal startup !!
 
 //#define FIXED_DUTY_MODE  // bypasses signal input and arming, uses a set duty cycle. For pumps, slot cars etc
-//#define FIXED_DUTY_MODE_POWER 10     // 0-100 percent not used in fixed speed mode
+//#define FIXED_DUTY_MODE_POWER 100     // 0-100 percent not used in fixed speed mode
 
 //#define FIXED_SPEED_MODE  // bypasses input signal and runs at a fixed rpm using the speed control loop PID
 //#define FIXED_SPEED_MODE_RPM  1000  // intended final rpm , ensure pole pair numbers are entered correctly in config tool.
@@ -362,8 +373,8 @@ char brushed_direction_set = 0;
 
 uint16_t tenkhzcounter = 0;
 float consumed_current = 0;
-uint16_t smoothed_raw_current = 0;
-uint16_t actual_current = 0;
+int32_t smoothed_raw_current = 0;
+int16_t actual_current = 0;
 
 char lowkv = 0;
 
@@ -546,7 +557,7 @@ uint8_t ubAnalogWatchdogStatus = RESET;
 
 void checkForHighSignal(){
 changeToInput();
-	gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
+	gpio_mode_set(GPIO_MODE_INPUT, GPIO_PULL_DOWN, INPUT_PIN);
 delayMicros(100);
 for(int i = 0 ; i < 1000; i ++){
 	 if(!((INPUT_PIN_PORT->idt & INPUT_PIN))){  // if the pin is low for 5 checks out of 100 in  100ms or more its either no signal or signal. jump to application
@@ -554,7 +565,7 @@ for(int i = 0 ; i < 1000; i ++){
 	 }
      delayMicros(10);
 }
-gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
+gpio_mode_set(GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 	 if(low_pin_count > 5){
 		 return;      // its either a signal or a disconnected pin
 	 }else{
@@ -568,7 +579,7 @@ gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 float doPidCalculations(struct fastPID *pidnow, int actual, int target){
 
 	pidnow->error = actual - target;
-	pidnow->integral = pidnow->integral + pidnow->error*pidnow->Ki + pidnow->last_error*pidnow->Ki;
+	pidnow->integral = pidnow->integral + pidnow->error*pidnow->Ki;
 	if(pidnow->integral > pidnow->integral_limit){
 		pidnow->integral = pidnow->integral_limit;
 	}
@@ -724,7 +735,7 @@ void loadEEpromSettings(){
 	   minimum_duty_cycle = eepromBuffer[25]/2 + dead_time_override;
 	   throttle_max_at_low_rpm  = throttle_max_at_low_rpm + dead_time_override;
 	   startup_max_duty_cycle = startup_max_duty_cycle  + dead_time_override;
-	//   TIMER_CCHP(TIMER0)|= TIMER_CCHP_DTCFG & dead_time_override;
+       TMR1->brk |= dead_time_override;
 	   }
 	   
 	   if(eepromBuffer[43] >= 70 && eepromBuffer[43] <= 140){ 
@@ -777,7 +788,8 @@ void loadEEpromSettings(){
 	   low_rpm_level  = motor_kv / 100 / (32 / motor_poles);
 	   high_rpm_level = motor_kv / 17 / (32/motor_poles);
 	   }
-	   reverse_speed_threshold =  map(motor_kv, 300, 3000, 2500 , 1250);
+	//   reverse_speed_threshold =  map(motor_kv, 300, 3000, 2500 , 1250);
+		 reverse_speed_threshold = 100;
 	if(!comp_pwm){
 		bi_direction = 0;
 	}
@@ -826,17 +838,17 @@ void saveEEpromSettings(){
 
 
 
-void getSmoothedInput() {
+uint32_t getSmoothedCurrent() {
 
 		total = total - readings[readIndex];
-		readings[readIndex] = commutation_interval;
+		readings[readIndex] = ADC_raw_current;
 		total = total + readings[readIndex];
 		readIndex = readIndex + 1;
 		if (readIndex >= numReadings) {
 			readIndex = 0;
 		}
 		smoothedinput = total / numReadings;
-
+    return smoothedinput;
 
 }
 
@@ -870,8 +882,8 @@ void getBemfState(){
 
 
 void commutate(){
-	commutation_intervals[step-1] = commutation_interval;
-	e_com_time = (commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] +commutation_intervals[5]) >> 1;  // COMMUTATION INTERVAL IS 0.5US INCREMENTS
+	commutation_intervals[step-1] = thiszctime;
+	e_com_time = ((commutation_intervals[0] + commutation_intervals[1] + commutation_intervals[2] + commutation_intervals[3] + commutation_intervals[4] +commutation_intervals[5])+4) >> 1;  // COMMUTATION INTERVAL IS 0.5US INCREMENTS
 
 	if (forward == 1){
 		step++;
@@ -990,17 +1002,20 @@ void startMotor() {
 }
 
 void tenKhzRoutine(){
-	tenkhzcounter++;
 	
+	tenkhzcounter++;
+	#if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
+	#else
 		  if(boot_up_tune_played == 0){
 			if(tenkhzcounter > 1000){ 
 			playStartupTune();
 			boot_up_tune_played = 1;
 			}
 	  }
-	
-	if(tenkhzcounter > 10000){      // 1s sample interval
-		consumed_current = (float)actual_current/360 + consumed_current;
+	#endif
+
+	if(tenkhzcounter > 10000){      // 1s 
+			consumed_current = (float)actual_current/360 + consumed_current;
 							switch (dshot_extended_telemetry){
 
 					case 1:
@@ -1027,7 +1042,11 @@ if(!armed){
 				if(zero_input_count > 30){
 				armed = 1;
 	//			receiveDshotDma();
+				#ifdef USE_WS2812
+				send_LED_RGB(0,125,0);		 
+				#endif
 				#ifdef USE_RGB_LED
+					
 				  			GPIOB->BRR = LL_GPIO_PIN_3;    // turn on green
 				  			GPIOB->BSRR = LL_GPIO_PIN_8;   // turn on green
 				  			GPIOB->BSRR = LL_GPIO_PIN_5;
@@ -1206,7 +1225,7 @@ if(!prop_brake_active){
 	 }
 	 if(maximum_throttle_change_ramp){
 	//	max_duty_cycle_change = map(k_erpm, low_rpm_level, high_rpm_level, 1, 40);
-			if(average_interval > 500){
+			if(average_interval > 300){
 				max_duty_cycle_change = 10;
 			}else{
 				max_duty_cycle_change = 30;
@@ -1414,7 +1433,58 @@ void zcfoundroutine(){   // only used in polling mode, blocking routine.
     }
 
 }
+#ifdef BRUSHED_MODE
+void runBrushedLoop(){
 
+    uint16_t brushed_duty_cycle = 0;
+    
+	if(brushed_direction_set == 0 && adjusted_input > 48){
+		if(forward){
+			allOff();
+			delayMicros(10);
+			twoChannelForward();
+		}else{
+			allOff();
+			delayMicros(10);
+			twoChannelReverse();
+		}
+    	brushed_direction_set = 1;
+	}
+
+	brushed_duty_cycle = map(adjusted_input, 48, 2047, 0, TIMER1_MAX_ARR - 100);
+
+	   if(degrees_celsius > TEMPERATURE_LIMIT){
+		   duty_cycle_maximum = map(degrees_celsius, TEMPERATURE_LIMIT, TEMPERATURE_LIMIT+20, TIMER1_MAX_ARR/2, 1);
+	   }else{
+		   duty_cycle_maximum = TIMER1_MAX_ARR - 50;
+	   }
+	   if(brushed_duty_cycle > duty_cycle_maximum){
+		   brushed_duty_cycle = duty_cycle_maximum;
+	   }
+
+	  if(use_current_limit){
+		use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current, CURRENT_LIMIT*100)/10000);
+		if(use_current_limit_adjust < minimum_duty_cycle){
+			use_current_limit_adjust = minimum_duty_cycle;
+		}
+
+		 if (brushed_duty_cycle > use_current_limit_adjust){
+				 brushed_duty_cycle = use_current_limit_adjust;
+			 }
+	  }
+if((brushed_duty_cycle > 0) && armed){
+	  TMR1->c1dt = brushed_duty_cycle;
+		TMR1->c2dt = brushed_duty_cycle;
+		TMR1->c3dt = brushed_duty_cycle;
+		
+	}else{
+	  				TMR1->c1dt = 0;												
+	  				TMR1->c2dt = 0;
+	  				TMR1->c3dt = 0;
+		brushed_direction_set = 0;
+}
+}
+#endif
 
 int main(void)
 {
@@ -1566,7 +1636,7 @@ tmr_channel_enable(IC_TIMER_REGISTER, IC_TIMER_CHANNEL, TRUE);
 IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 
 #endif
-
+gpio_mode_set(GPIO_MODE_MUX, GPIO_PULL_UP, INPUT_PIN);
 receiveDshotDma();
 
 if(drive_by_rpm){
@@ -1578,6 +1648,10 @@ if(drive_by_rpm){
 
 adc_counter = 9;
 
+ #ifdef USE_WS2812
+WS2812_Init();
+send_LED_RGB(125,0,0);
+ #endif
 
  while (1)
   {
@@ -1587,15 +1661,22 @@ WDT->cmd = WDT_CMD_RELOAD;
 	  if(adc_counter>20){   // for testing adc and telemetry
 
 					ADC_raw_temp = ADC_raw_temp - (temperature_offset);
-					converted_degrees =(12600 - (int32_t)ADC_raw_temp * 33000 / 4096) / -42 + 25;
-					degrees_celsius =(7 * degrees_celsius + converted_degrees) >> 3;
+#ifndef USE_NTC
+ 			converted_degrees =(12600 - (int32_t)ADC_raw_temp * 33000 / 4096) / -42 + 25;
+			degrees_celsius =(7 * degrees_celsius + converted_degrees) >> 3;
+#else
+		//	UTILITY_TIMER->c1dt = ADC_raw_temp;
+	       degrees_celsius = (4000 - ADC_raw_temp) / 20; 
+#endif
+   // 			
           battery_voltage = ((7 * battery_voltage) + ((ADC_raw_volts * 3300 / 4095 * VOLTAGE_DIVIDER)/100)) >> 3;
-          smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
+			    smoothed_raw_current = getSmoothedCurrent();
+    //      smoothed_raw_current = ((63*smoothed_raw_current + (ADC_raw_current) )>>6);
           actual_current = ((smoothed_raw_current * 3300/41) - (CURRENT_OFFSET*100))/ (MILLIVOLT_PER_AMP);
 		      if(actual_current < 0){actual_current = 0;}     
 
 			    adc_ordinary_software_trigger_enable(ADC1, TRUE);
-			UTILITY_TIMER->c1dt = degrees_celsius;
+//			UTILITY_TIMER->c1dt = degrees_celsius;
 
 		  if(LOW_VOLTAGE_CUTOFF){
 			  if(battery_voltage < (cell_count * low_cell_volt_cutoff)){
@@ -1840,7 +1921,7 @@ if(newinput > 2000){
 	 	  }
 		  if ( stepper_sine == 0){
 
-  e_rpm = running * (100000/ e_com_time) * 6;       // in tens of rpm
+  e_rpm = running * (600000/ e_com_time);       // in tens of rpm
   k_erpm =  e_rpm / 10; // ecom time is time for one electrical revolution in microseconds
 
   if(low_rpm_throttle_limit){     // some hardware doesn't need this, its on by default to keep hardware / motors protected but can slow down the response in the very low end a little.
@@ -2010,33 +2091,7 @@ TMR1->c3dt = 0;
 #endif    // end of brushless mode
 
 #ifdef BRUSHED_MODE
-          TMR14->c1dt = adjusted_input;
-	  			if(brushed_direction_set == 0 && adjusted_input > 48){
-	  				if(forward){
-	  					allOff();
-	  					delayMicros(10);
-	  					twoChannelForward();
-	  				}else{
-	  					allOff();
-	  					delayMicros(10);
-	  					twoChannelReverse();
-	  				}
-	  				brushed_direction_set = 1;
-	  			}
-	  			if(adjusted_input > 1900){
-	  				adjusted_input = 1900;
-	  			}
-	  			input = map(adjusted_input, 48, 2047, 0, TIMER1_MAX_ARR);
-
-	  			if(input > 0 && armed){
-	  				TMR1->c1dt = input;												// set duty cycle to 50 out of 768 to start.
-	  				TMR1->c2dt = input;
-	  				TMR1->c3dt = input;
-	  			}else{
-	  				TMR1->c1dt = 0;												// set duty cycle to 50 out of 768 to start.
-	  				TMR1->c2dt = 0;
-	  				TMR1->c3dt = 0;
-	  			}
+runBrushedLoop();
 #endif
   		}
 }

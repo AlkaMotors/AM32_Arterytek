@@ -45,7 +45,7 @@ extern char play_tone_flag;
 uint8_t command_count = 0;
 uint8_t last_command = 0;
 uint8_t high_pin_count = 0;
-uint32_t gcr[26] =  {0};
+uint32_t gcr[30] =  {0};
 uint16_t dshot_frametime;
 uint16_t dshot_goodcounts;
 uint16_t dshot_badcounts;
@@ -59,7 +59,7 @@ void computeDshotDMA(){
 
 int j = 0;
 dshot_frametime = dma_buffer[31]- dma_buffer[0];
-//UTILITY_TIMER->c1dt = dshot_frametime;
+////UTILITY_TIMER->c1dt = dshot_frametime;
 halfpulsetime = (dshot_frametime >> 5) + (dshot_frametime >> 8);
 if((dshot_frametime < 500)&&(dshot_frametime > 300)){
 for (int i = 0; i < 16; i++){
@@ -67,7 +67,7 @@ for (int i = 0; i < 16; i++){
 }	
 	
 	
-	
+//	
 //#if defined MCU_AT421
 
 //				if((dshot_frametime < 3500)&&(dshot_frametime > 2800)){
@@ -264,18 +264,18 @@ for (int i = 15; i >= 9 ; i--){
 //GCR RLL encode 20 to 21bit output
 
 #ifdef MCU_AT421
-		  gcr[1+3] = 78;
+		  gcr[1+buffer_padding] = 78;
 		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-			  gcr[3+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[3+20-i]>>6)) *78;        // exclusive ored with number before it multiplied by 64 to match output timer.
+			  gcr[buffer_padding+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[buffer_padding+20-i]>>6)) *78;        // exclusive ored with number before it multiplied by 64 to match output timer.
 		  }
-          gcr[3] = 0;
+          gcr[buffer_padding] = 0;
 #endif
 #ifdef MCU_AT415
-		  gcr[1+3] = 97;
+		  gcr[1+buffer_padding] = 97;
 		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-			  gcr[3+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[3+20-i]>>6)) *97;        // exclusive ored with number before it multiplied by 64 to match output timer.
+			  gcr[buffer_padding+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[buffer_padding+20-i]>>6)) *97;        // exclusive ored with number before it multiplied by 64 to match output timer.
 		  }
-          gcr[3] = 0;
+          gcr[buffer_padding] = 0;
 #endif
 		
 }
