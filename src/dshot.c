@@ -226,7 +226,7 @@ if(send_extended_dshot > 0){
   dshot_full_number = send_extended_dshot;
   send_extended_dshot = 0;
 }else{
-  if (!running){
+  if (!running || e_com_time > 65535){
 	  e_com_time = 65535;
   }
 //	calculate shift amount for data in format eee mmm mmm mmm, first 1 found in first seven bits of data determines shift amount
