@@ -69,8 +69,8 @@ void playBlueJayTune(){
 	uint16_t duration;
 	float frequency;
 	comStep(3);
-	//read_flash_bin(blueJayTuneBuffer , EEPROM_START_ADD + 48 , 128);
-	for(int i = 52 ; i < 176 ; i+=2){
+	//read_flash_bin(blueJayTuneBuffer , EEPROM_START_ADD + 55 , 128);
+	for(int i = 59 ; i < 183 ; i+=2){
 	WDT->cmd = WDT_CMD_RELOAD;
 		signaltimeout = 0;
 
@@ -102,7 +102,7 @@ WDT->cmd = WDT_CMD_RELOAD;
 void playStartupTune(){
 	__disable_irq();
 
-	uint8_t value = *(uint8_t*)(EEPROM_START_ADD+48);
+	uint8_t value = *(uint8_t*)(EEPROM_START_ADD+55);
 		if(value != 0xFF){
 		playBlueJayTune();
 		}else{

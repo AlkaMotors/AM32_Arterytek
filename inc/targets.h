@@ -220,7 +220,8 @@
 #define FIRMWARE_NAME           "AIKON S F4  "
 #define FILE_NAME                "AIKON_SINGLE_F421"
 #define DEAD_TIME               60
-#define HARDWARE_GROUP_AT_A
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 

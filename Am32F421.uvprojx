@@ -185,6 +185,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -579,6 +580,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -760,6 +841,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1154,6 +1236,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -1335,6 +1497,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -1729,13 +1892,93 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
       <TargetName>AIKON_SINGLE</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -1910,6 +2153,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -2304,6 +2548,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -2485,6 +2809,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -2879,13 +3204,93 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
       <TargetName>AIKON_55A</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -3060,6 +3465,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -3454,13 +3860,93 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
       <TargetName>WRAITH32</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>6160000::V6.16::ARMCLANG</pCCUsed>
+      <pCCUsed>6190000::V6.19::ARMCLANG</pCCUsed>
       <uAC6>1</uAC6>
       <TargetOption>
         <TargetCommonOption>
@@ -3635,6 +4121,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -4029,6 +4516,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -4210,6 +4777,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -4604,6 +5172,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -4785,6 +5433,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -5179,6 +5828,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -5360,6 +6089,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -5754,6 +6484,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -5935,6 +6745,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -6329,6 +7140,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -6510,6 +7401,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -6904,6 +7796,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -7085,6 +8057,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -7479,6 +8452,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -7660,6 +8713,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -8054,6 +9108,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -8235,6 +9369,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -8629,6 +9764,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -8810,6 +10025,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -9204,6 +10420,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -9385,6 +10681,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -9779,6 +11076,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -9960,6 +11337,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -10354,6 +11732,86 @@
             </File>
           </Files>
         </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
+            </File>
+          </Files>
+        </Group>
       </Groups>
     </Target>
     <Target>
@@ -10535,6 +11993,7 @@
             <RvdsVP>0</RvdsVP>
             <RvdsMve>0</RvdsMve>
             <RvdsCdeCp>0</RvdsCdeCp>
+            <nBranchProt>0</nBranchProt>
             <hadIRAM2>0</hadIRAM2>
             <hadIROM2>0</hadIROM2>
             <StupSel>8</StupSel>
@@ -10926,6 +12385,86 @@
               <FileName>serial_telemetry.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\mcu\F421\mcusrc\serial_telemetry.c</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Inc</GroupName>
+          <Files>
+            <File>
+              <FileName>ADC.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\ADC.h</FilePath>
+            </File>
+            <File>
+              <FileName>common.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\common.h</FilePath>
+            </File>
+            <File>
+              <FileName>comparator.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\comparator.h</FilePath>
+            </File>
+            <File>
+              <FileName>dshot.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\dshot.h</FilePath>
+            </File>
+            <File>
+              <FileName>eeprom.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\eeprom.h</FilePath>
+            </File>
+            <File>
+              <FileName>firmwareversion.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\firmwareversion.h</FilePath>
+            </File>
+            <File>
+              <FileName>functions.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\functions.h</FilePath>
+            </File>
+            <File>
+              <FileName>IO.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\IO.h</FilePath>
+            </File>
+            <File>
+              <FileName>main.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\main.h</FilePath>
+            </File>
+            <File>
+              <FileName>phaseouts.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\phaseouts.h</FilePath>
+            </File>
+            <File>
+              <FileName>serial_telemetry.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\serial_telemetry.h</FilePath>
+            </File>
+            <File>
+              <FileName>signal.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\signal.h</FilePath>
+            </File>
+            <File>
+              <FileName>sounds.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\sounds.h</FilePath>
+            </File>
+            <File>
+              <FileName>targets.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\targets.h</FilePath>
+            </File>
+            <File>
+              <FileName>WS2812.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\inc\WS2812.h</FilePath>
             </File>
           </Files>
         </Group>
