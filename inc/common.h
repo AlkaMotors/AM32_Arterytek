@@ -1,10 +1,13 @@
 #pragma once
 #include "main.h"
 
+// 18 is the max buffer_padding selected in IO.c
+#define GCR_BUFFER_SIZE (23 + 18)
+
 extern uint8_t eepromBuffer[176];
 extern uint16_t TIMER1_MAX_ARR;
 
-extern uint32_t gcr[30];
+extern uint32_t gcr[GCR_BUFFER_SIZE];
 extern uint16_t adjusted_input;
 extern uint32_t dma_buffer[64];
 extern uint8_t dshotcommand;
