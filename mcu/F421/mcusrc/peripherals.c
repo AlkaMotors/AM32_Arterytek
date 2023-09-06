@@ -110,7 +110,38 @@ void TIM1_Init(void){
 	TMR1->cm1 = 0x6868;   // Channel 1 and 2 in PWM output mode
 	TMR1->cm2 = 0x68;     // channel 3 in PWM output mode
 
-		tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_1, TRUE);
+#ifdef USE_INVERTED_HIGH
+    TMR1->cctrl_bit.c1p = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->cctrl_bit.c2p = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->cctrl_bit.c3p = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->ctrl2_bit.c1ios = TRUE;
+    TMR1->ctrl2_bit.c2ios = TRUE;
+    TMR1->ctrl2_bit.c3ios = TRUE;
+#else
+    TMR1->cctrl_bit.c1p = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->cctrl_bit.c2p = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->cctrl_bit.c3p = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->ctrl2_bit.c1ios = FALSE;
+    TMR1->ctrl2_bit.c2ios = FALSE;
+    TMR1->ctrl2_bit.c3ios = FALSE;
+#endif
+#ifdef USE_INVERTED_LOW
+    TMR1->cctrl_bit.c1cp = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->cctrl_bit.c2cp = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->cctrl_bit.c3cp = TMR_OUTPUT_ACTIVE_LOW;
+    TMR1->ctrl2_bit.c1cios = TRUE;
+    TMR1->ctrl2_bit.c2cios = TRUE;
+    TMR1->ctrl2_bit.c3cios = TRUE;
+#else
+    TMR1->cctrl_bit.c1cp = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->cctrl_bit.c2cp = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->cctrl_bit.c3cp = TMR_OUTPUT_ACTIVE_HIGH;
+    TMR1->ctrl2_bit.c1cios = FALSE;
+    TMR1->ctrl2_bit.c2cios = FALSE;
+    TMR1->ctrl2_bit.c3cios = FALSE;
+#endif
+
+    tmr_output_channel_buffer_enable(TMR1, TMR_SELECT_CHANNEL_1, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_2, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_3, TRUE);
 
