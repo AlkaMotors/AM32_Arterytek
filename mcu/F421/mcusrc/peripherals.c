@@ -78,6 +78,7 @@ void AT_COMP_Init(void)
   crm_periph_clock_enable(CRM_CMP_PERIPH_CLOCK, TRUE);
     /* configure PA1 as comparator input */
      gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_1);
+
    //  rcu_periph_clock_enable(RCU_CFGCMP);
 
      gpio_mode_QUICK(GPIOA, GPIO_MODE_ANALOG, GPIO_PULL_NONE, GPIO_PINS_5);
@@ -110,7 +111,13 @@ void TIM1_Init(void){
 	TMR1->cm1 = 0x6868;   // Channel 1 and 2 in PWM output mode
 	TMR1->cm2 = 0x68;     // channel 3 in PWM output mode
 
-		tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_1, TRUE);
+#ifdef USE_INVERTED_HIGH
+	tmr_output_channel_polarity_set(TMR1,TMR_SELECT_CHANNEL_1,TMR_POLARITY_ACTIVE_LOW);
+	tmr_output_channel_polarity_set(TMR1,TMR_SELECT_CHANNEL_2,TMR_POLARITY_ACTIVE_LOW);
+	tmr_output_channel_polarity_set(TMR1,TMR_SELECT_CHANNEL_3,TMR_POLARITY_ACTIVE_LOW);
+#endif	
+
+	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_1, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_2, TRUE);
 	tmr_output_channel_buffer_enable(TMR1,TMR_SELECT_CHANNEL_3, TRUE);
 
@@ -120,27 +127,19 @@ void TIM1_Init(void){
 
 	crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
 	crm_periph_clock_enable(CRM_GPIOB_PERIPH_CLOCK, TRUE);
-	
-	    /*configure PA8/PA9/PA10(TIMER0/CH0/CH1/CH2) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-
-
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-
-
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
+		    /*configure PA8/PA9/PA10(TIMER0/CH0/CH1/CH2) as alternate function*/
+   gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
+   gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
+   gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
 
 gpio_pin_mux_config(PHASE_A_GPIO_PORT_LOW, PHASE_A_PIN_SOURCE_LOW, GPIO_MUX_2);
 gpio_pin_mux_config(PHASE_B_GPIO_PORT_LOW, PHASE_B_PIN_SOURCE_LOW, GPIO_MUX_2);
 gpio_pin_mux_config(PHASE_C_GPIO_PORT_LOW, PHASE_C_PIN_SOURCE_LOW, GPIO_MUX_2);
 
-
-    /*configure PB13/PB14/PB15(TIMER0/CH0N/CH1N/CH2N) as alternate function*/
-    gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
-
-    gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
-
-    gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
+   /*configure PB13/PB14/PB15(TIMER0/CH0N/CH1N/CH2N) as alternate function*/
+   gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
+   gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
+   gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
 
 gpio_pin_mux_config(PHASE_A_GPIO_PORT_HIGH, PHASE_A_PIN_SOURCE_HIGH, GPIO_MUX_2);
 gpio_pin_mux_config(PHASE_B_GPIO_PORT_HIGH, PHASE_B_PIN_SOURCE_HIGH, GPIO_MUX_2);
@@ -164,7 +163,7 @@ void TIM14_Init(void)
 {
 	crm_periph_clock_enable(CRM_TMR14_PERIPH_CLOCK, TRUE);
 
-	TMR14->pr = 100;
+	TMR14->pr = 1000000/LOOP_FREQUENCY_HZ;
 	TMR14->div = 119;
 	
 	
@@ -226,6 +225,8 @@ void UN_TIM_Init(void)
 	crm_periph_clock_enable(CRM_GPIOA_PERIPH_CLOCK, TRUE);
 	crm_periph_clock_enable(CRM_TMR15_PERIPH_CLOCK, TRUE);
   gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
+	
+	
 #endif
  
 crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
@@ -259,6 +260,19 @@ crm_periph_clock_enable(CRM_DMA1_PERIPH_CLOCK, TRUE);
 	IC_TIMER_REGISTER->div = 16;
 	IC_TIMER_REGISTER->ctrl1_bit.prben = TRUE;
 	IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
+	#ifdef USE_TIMER_3_CHANNEL_1
+		crm_periph_clock_enable(CRM_TMR15_PERIPH_CLOCK, TRUE);
+	TMR15->pr = 25;
+	TMR15->div = 119;
+	TMR15->ctrl1_bit.tmren = TRUE;
+NVIC_SetPriority(TMR15_GLOBAL_IRQn, 0);
+NVIC_EnableIRQ(TMR15_GLOBAL_IRQn);
+#endif
+#ifdef USE_TIMER_15_CHANNEL_1
+//NVIC_SetPriority(TMR15_GLOBAL_IRQn, 0);
+//  NVIC_EnableIRQ(TMR15_GLOBAL_IRQn);
+#endif
+		
 		
 }
 

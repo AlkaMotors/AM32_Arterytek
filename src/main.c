@@ -164,6 +164,8 @@
 *1.98    - Dshot erpm rounding compensation. 	
 *1.99    -Dshot timing fixes, input capture filter
 *2.00    -Cleanup of target structure
+*2.01    -increase 10khztimer to 20khz, increase max duty cycle change. 
+*2.02		 -Increase startup power for inverted output targets.
  */	     
 
 
@@ -203,7 +205,7 @@
 uint16_t comp_change_time = 0;
 
 #define VERSION_MAJOR 2
-#define VERSION_MINOR 00
+#define VERSION_MINOR 02
 
 //firmware build options !! fixed speed and duty cycle modes are not to be used with sinusoidal startup !!
 
@@ -223,6 +225,8 @@ uint16_t comp_change_time = 0;
 uint8_t drive_by_rpm = 0;
 uint32_t MAXIMUM_RPM_SPEED_CONTROL = 12000;
 uint32_t MINIMUM_RPM_SPEED_CONTROL = 2000;
+
+#define PID_LOOP_DIVIDER (LOOP_FREQUENCY_HZ/1000)
 
  //assign speed control PID values values are x10000
  fastPID speedPid = {      //commutation speed loop time
@@ -259,6 +263,7 @@ uint16_t target_e_com_time_low;
 	 EDTARM,
  };
 char eeprom_layout_version = 2;
+uint8_t compute_dshot_flag = 0;
 char dir_reversed = 0;
 char comp_pwm = 1;
 char VARIABLE_PWM = 1;
@@ -398,7 +403,7 @@ typedef enum
   GPIO_PIN_SET
 }GPIO_PinState;
 
-uint16_t startup_max_duty_cycle = 300 + DEAD_TIME;
+uint16_t startup_max_duty_cycle = 200 + DEAD_TIME;
 uint16_t minimum_duty_cycle = DEAD_TIME;
 uint16_t stall_protect_minimum_duty = DEAD_TIME;
 char desync_check = 0;
@@ -660,9 +665,14 @@ void loadEEpromSettings(){
 	    }
 
 	   if(eepromBuffer[25] < 151 && eepromBuffer[25] > 49){
-	   min_startup_duty = (eepromBuffer[25]/2 + DEAD_TIME) * TIMER1_MAX_ARR / 2000;
-	   minimum_duty_cycle = (eepromBuffer[25]/ 4 + DEAD_TIME/4) * TIMER1_MAX_ARR / 2000 ;
+	   min_startup_duty = (eepromBuffer[25]/2 + DEAD_TIME);
+	   minimum_duty_cycle = (eepromBuffer[25]/ 4 + DEAD_TIME/4);
 	   stall_protect_minimum_duty = minimum_duty_cycle+10;
+#ifdef USE_INVERTED_HIGH
+		 min_startup_duty = (eepromBuffer[25]*2 + DEAD_TIME*2);
+	   minimum_duty_cycle = (eepromBuffer[25]*2 + DEAD_TIME);
+	   stall_protect_minimum_duty = minimum_duty_cycle+10;
+#endif
 	    }else{
 	    	min_startup_duty = 150;
 	    	minimum_duty_cycle = (min_startup_duty / 2) + 10;
@@ -683,10 +693,14 @@ void loadEEpromSettings(){
 	   if(eepromBuffer[1] > 0){             // these commands weren't introduced until eeprom version 1.
 
 		   if(eepromBuffer[30] > 11){
-			   setVolume(5);
+			   setVolume(7);
 		   }else{
+#ifdef BEEP_RAMP_DEBUG					 
+				 setVolume(7);
+#else
 			   setVolume(eepromBuffer[30]);
-		   }
+#endif
+				 }
 		   if(eepromBuffer[31] == 0x01){
 			   TLM_ON_INTERVAL = 1;
 		   }else{
@@ -788,8 +802,8 @@ void loadEEpromSettings(){
 	   low_rpm_level  = motor_kv / 100 / (32 / motor_poles);
 	   high_rpm_level = motor_kv / 17 / (32/motor_poles);
 	   }
-	//   reverse_speed_threshold =  map(motor_kv, 300, 3000, 2500 , 1250);
-		 reverse_speed_threshold = 100;
+	   reverse_speed_threshold =  map(motor_kv, 300, 3000, 2500 , 1250);
+	//	 reverse_speed_threshold = 100;
 	if(!comp_pwm){
 		bi_direction = 0;
 	}
@@ -901,11 +915,11 @@ void commutate(){
 		rising = !(step % 2);
 	}
 /***************************************************/
-	UTILITY_TIMER->cval = 0;
+//	UTILITY_TIMER->cval = 0;
 	if(!prop_brake_active){
 	comStep(step);
 	}
-  comp_change_time = UTILITY_TIMER->cval;
+//  comp_change_time = UTILITY_TIMER->cval;
 /****************************************************/
 	changeCompInput();
   if(average_interval > 2000 && (stall_protection || RC_CAR_REVERSE)){
@@ -981,7 +995,8 @@ thiszctime = INTERVAL_TIMER->cval;
 			    }
 				}
 			}
-			
+		//				advance = (thiszctime>>3) * advance_level;   // 60 divde 8 7.5 degree increments
+		//	      waitTime = (thiszctime >>1)  - advance;
 						maskPhaseInterrupts();
 						INTERVAL_TIMER->cval = 0 ;
 						waitTime = waitTime >> fast_accel;
@@ -1001,20 +1016,210 @@ void startMotor() {
 	enableCompInterrupts();
 }
 
-void tenKhzRoutine(){
-	
+void tenKhzRoutine(){ 
+			if(compute_dshot_flag == 1){	
+			computeDshotDMA();
+			compute_dshot_flag = 0;
+		}
+		if(compute_dshot_flag == 2){
+			receiveDshotDma();
+			make_dshot_package();
+			compute_dshot_flag = 0;
+			return;
+		}
 	tenkhzcounter++;
 	#if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
 	#else
 		  if(boot_up_tune_played == 0){
-			if(tenkhzcounter > 1000){ 
+			if(tenkhzcounter > LOOP_FREQUENCY_HZ/10){ 
 			playStartupTune();
 			boot_up_tune_played = 1;
 			}
 	  }
 	#endif
+		if(bi_direction){
+  		  if (dshot == 0){
+  			  if(RC_CAR_REVERSE){
+  				  if (newinput > (1000 + (servo_dead_band<<1))) {
+  					  if (forward == dir_reversed) {
+  						  adjusted_input = 0;
+  						  if(running){
+  							  prop_brake_active = 1;
+  						  }else{
+  							  forward = 1 - dir_reversed;
+  						  }
+  					  }
+  					  if (prop_brake_active == 0) {
+  						  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
+  					  }
+  				  }
+  				  if (newinput < (1000 -(servo_dead_band<<1))) {
+  					  if (forward == (1 - dir_reversed)) {
+  						  if(running){
+  							  prop_brake_active = 1;
+  						  }else{
+  							  forward = dir_reversed;
+  						  }
+  						  adjusted_input = 0;
 
-	if(tenkhzcounter > 10000){      // 1s 
+  					  }
+  					  if (prop_brake_active == 0) {
+  						  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
+  					  }
+  				  }
+
+
+  				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
+  					  adjusted_input = 0;
+  					  prop_brake_active = 0;
+  				  }
+  			  }else{
+  				  if (newinput > (1000 + (servo_dead_band<<1))) {
+  					  if (forward == dir_reversed) {
+  						  if(running == 0 || (commutation_interval > reverse_speed_threshold && (duty_cycle < 200))){
+  							  forward = 1 - dir_reversed;
+  							  zero_crosses = 0;
+  							  old_routine = 1;
+  							  maskPhaseInterrupts();
+  							brushed_direction_set = 0;
+  						  }else{
+  							  newinput = 1000;
+  						  }
+  					  }
+  					  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
+  				  }
+  				  if (newinput < (1000 -(servo_dead_band<<1))) {
+  					  if (forward == (1 - dir_reversed)) {
+  						  if(running == 0 ||(commutation_interval > reverse_speed_threshold && (duty_cycle < 200))){
+						//		if(duty_cycle < 100){
+  							  zero_crosses = 0;
+  							  old_routine = 1;
+  							  forward = dir_reversed;
+  							  maskPhaseInterrupts();
+  							brushed_direction_set = 0;
+  						  }else{
+  							  newinput = 1000;
+
+  						  }
+  					  }
+  					  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
+  				  }
+
+ 				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
+  					  adjusted_input = 0;
+  					brushed_direction_set = 0;
+  				  }
+  			  }
+ 		  }else if (dshot) {
+  			  if (newinput > 1047) {
+
+  				  if (forward == dir_reversed) {
+  					  if(running == 0 || (commutation_interval > reverse_speed_threshold && (duty_cycle < 200))){
+  						  forward = 1 - dir_reversed;
+  						  zero_crosses = 0;
+  						  old_routine = 1;
+  						  maskPhaseInterrupts();
+  						brushed_direction_set = 0;
+  					  }else{
+  						  newinput = 0;
+
+  					  }
+  				  }
+  				  adjusted_input = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
+
+  			  }
+  			  if (newinput <= 1047  && newinput > 47) {
+  				  //	startcount++;
+
+  				  if (forward == (1 - dir_reversed)) {
+  					  if(running == 0 || (commutation_interval > reverse_speed_threshold && (duty_cycle < 200))){
+  						  zero_crosses = 0;
+  						  old_routine = 1;
+  						  forward = dir_reversed;
+  						  maskPhaseInterrupts();
+  						brushed_direction_set = 0;
+  					  }else{
+  						  newinput = 0;
+
+  					  }
+  				  }
+  				  adjusted_input = ((newinput - 48) * 2 + 47) - reversing_dead_band;
+  			  }
+  			  if ( newinput < 48) {
+  				  adjusted_input = 0;
+  				brushed_direction_set = 0;
+  			  }
+
+
+  		  }
+  			  
+  		  }else{
+					adjusted_input = newinput;
+				}
+if(bemf_timeout_happened > bemf_timeout * ( 1 + (crawler_mode*100))&& stuck_rotor_protection){
+	 		 allOff();
+	 		 maskPhaseInterrupts();
+	 		 input = 0;
+	 		bemf_timeout_happened = 102;
+				#ifdef USE_WS2812
+				send_LED_RGB(125,0,0);		 
+				#endif
+#ifdef USE_RGB_LED
+			  GPIOB->BRR = LL_GPIO_PIN_8; // on red
+			  GPIOB->BSRR = LL_GPIO_PIN_5;  //
+			  GPIOB->BSRR = LL_GPIO_PIN_3;
+#endif
+	 	  }else{
+#ifdef FIXED_DUTY_MODE
+  			input = FIXED_DUTY_MODE_POWER * 20;
+#else
+	  	  	if(use_sin_start){
+  				if(adjusted_input < 30){           // dead band ?
+  					input= 0;
+  					}
+
+  					if(adjusted_input > 30 && adjusted_input < (sine_mode_changeover_thottle_level * 20)){
+  					input= map(adjusted_input, 30 , (sine_mode_changeover_thottle_level * 20) , 47 ,160);
+  					}
+  					if(adjusted_input >= (sine_mode_changeover_thottle_level * 20)){
+  					input = map(adjusted_input , (sine_mode_changeover_thottle_level * 20) ,2000 , 160, 2000);
+  					}
+  				}else{
+  					if(use_speed_control_loop){
+  					  if (drive_by_rpm){
+ 						target_e_com_time = 60000000 / map(adjusted_input , 47 ,2047 , MINIMUM_RPM_SPEED_CONTROL, MAXIMUM_RPM_SPEED_CONTROL) / (motor_poles/2);
+  		  				if(adjusted_input < 47){           // dead band ?
+  		  					input= 0;
+  		  					speedPid.error = 0;
+  		  				    input_override = 0;
+  		  				}else{
+  	  						input = (uint16_t)input_override;  // speed control pid override
+  	  						if(input_override > 2047){
+  	  							input = 2047;
+  	  						}
+  	  						if(input_override < 48){
+  	  							input = 48;
+  	  						}
+  		  				}
+					    }else{
+
+  						input = (uint16_t)input_override;  // speed control pid override
+  						if(input_override > 1999){
+  							input = 1999;
+  						}
+  						if(input_override < 48){
+  							input = 48;
+  						}
+					    }
+  					}else{
+
+  						input = adjusted_input;
+
+  					}
+  				}
+#endif
+				}
+	if(tenkhzcounter > LOOP_FREQUENCY_HZ){      // 1s 
 			consumed_current = (float)actual_current/360 + consumed_current;
 							switch (dshot_extended_telemetry){
 
@@ -1038,7 +1243,7 @@ if(!armed){
 	if(inputSet){
 		if(adjusted_input == 0){
 			armed_timeout_count++;
-			if(armed_timeout_count > 10000){    // one second
+			if(armed_timeout_count > LOOP_FREQUENCY_HZ){    // one second
 				if(zero_input_count > 30){
 				armed = 1;
 	//			receiveDshotDma();
@@ -1099,7 +1304,7 @@ if(!armed){
   	  }else{
 	 	 duty_cycle = map(input, 47, 2047, minimum_duty_cycle, TIMER1_MAX_ARR);
 	  }
-	  if(tenkhzcounter%10 == 0){     // 1khz PID loop
+	  if(tenkhzcounter%(PID_LOOP_DIVIDER) == 0){     // 1khz PID loop
 		  if(use_current_limit && running){
 			use_current_limit_adjust -= (int16_t)(doPidCalculations(&currentPid, actual_current, CURRENT_LIMIT*100)/10000);
 			if(use_current_limit_adjust < minimum_duty_cycle){
@@ -1110,8 +1315,7 @@ if(!armed){
 			}
 
 	  }
-
-		  	 if(stall_protection && running ){  // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
+	  	 if(stall_protection && running ){  // this boosts throttle as the rpm gets lower, for crawlers and rc cars only, do not use for multirotors.
 		  		 stall_protection_adjust += (doPidCalculations(&stallPid, commutation_interval, stall_protect_target_interval))/10000;
 		  					 if(stall_protection_adjust > 150){
 		  						stall_protection_adjust = 150;
@@ -1123,19 +1327,85 @@ if(!armed){
 	  }
 	  if(!RC_CAR_REVERSE){
 		  prop_brake_active = 0;
+	  }		
 	  }
-	  }
-	  if (input < 47 + (80*use_sin_start)){
-		if(play_tone_flag != 0){
-			if(play_tone_flag == 1){
-				playDefaultTone();
+		
+			if(!prop_brake_active){
+ if (zero_crosses < (20 >> stall_protection)){
+	   if (duty_cycle < min_startup_duty){
+	   duty_cycle = min_startup_duty;
 
-			}if(play_tone_flag == 2){
-				playChangedTone();
+	   }
+	   if (duty_cycle > startup_max_duty_cycle){
+		   duty_cycle = startup_max_duty_cycle;
+	   }
+ }
+ if (duty_cycle > duty_cycle_maximum){
+		 duty_cycle = duty_cycle_maximum;
+	 }
+	 if(use_current_limit){
+		 if (duty_cycle > use_current_limit_adjust){
+			 duty_cycle = use_current_limit_adjust;
+		 }
+	 }
+
+	 if(stall_protection_adjust > 0){
+
+		 duty_cycle = duty_cycle + (uint16_t)stall_protection_adjust;
+	 }
+	 if(maximum_throttle_change_ramp){
+#ifdef BEEP_RAMP_DEBUG	 
+		 max_duty_cycle_change = eepromBuffer[30];
+#else		 
+		 if((duty_cycle < 150) || (input < 47)){
+			 max_duty_cycle_change = 2;
+		 }else{
+			if(average_interval > 500){
+				max_duty_cycle_change = MAX_LOW_RPM_CHANGE;
+			}else{
+				max_duty_cycle_change = MAX_HIGH_RPM_CHANGE;
 			}
-			play_tone_flag = 0;
+		}
+#endif
+	 if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change){
+		duty_cycle = last_duty_cycle + max_duty_cycle_change;
+		if(commutation_interval > 500){
+			fast_accel = 1;
+		}else{
+			fast_accel = 0;
 		}
 
+	}else if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change){
+		duty_cycle = last_duty_cycle - max_duty_cycle_change;
+		fast_accel = 0;
+	}else{
+		fast_accel = 0;
+	}
+		}
+	}	
+		
+		
+	  if (input < 47 + (80*use_sin_start)){
+		if(play_tone_flag != 0){
+			switch (play_tone_flag){
+			case 1:
+				playDefaultTone();
+				break;
+		  case 2:
+				playChangedTone();
+			  break;
+			case 3:
+				playBeaconTune3();
+				break;
+			case 4:
+				playInputTune2();
+				break;
+			case 5:
+				playDefaultTone();
+				break;
+			}
+			play_tone_flag = 0;
+	}
 		  if(!comp_pwm){
 			duty_cycle = 0;
 			if(!running){
@@ -1179,6 +1449,7 @@ if(!armed){
 			  		  allOff();
 			  		  duty_cycle = 0;
 			  	  }
+					duty_cycle = 0;	
 		  }
 
 		  	  phase_A_position = ((step-1) * 60) + enter_sine_angle;
@@ -1198,55 +1469,10 @@ if(!armed){
 		    	 stepper_sine = 1;
 		 	  }
 		  }
+			duty_cycle = 0;	
 		  }
-if(!prop_brake_active){
- if (zero_crosses < (20 >> stall_protection)){
-	   if (duty_cycle < min_startup_duty){
-	   duty_cycle = min_startup_duty;
 
-	   }
-	   if (duty_cycle > startup_max_duty_cycle){
-		   duty_cycle = startup_max_duty_cycle;
-	   }
- }
-
-	 if (duty_cycle > duty_cycle_maximum){
-		 duty_cycle = duty_cycle_maximum;
-	 }
-	 if(use_current_limit){
-		 if (duty_cycle > use_current_limit_adjust){
-			 duty_cycle = use_current_limit_adjust;
-		 }
-	 }
-
-	 if(stall_protection_adjust > 0){
-
-		 duty_cycle = duty_cycle + (uint16_t)stall_protection_adjust;
-	 }
-	 if(maximum_throttle_change_ramp){
-	//	max_duty_cycle_change = map(k_erpm, low_rpm_level, high_rpm_level, 1, 40);
-			if(average_interval > 300){
-				max_duty_cycle_change = 10;
-			}else{
-				max_duty_cycle_change = 30;
-			}
-	 if ((duty_cycle - last_duty_cycle) > max_duty_cycle_change){
-		duty_cycle = last_duty_cycle + max_duty_cycle_change;
-		if(commutation_interval > 500){
-			fast_accel = 1;
-		}else{
-			fast_accel = 0;
-		}
-
-	}else if ((last_duty_cycle - duty_cycle) > max_duty_cycle_change){
-		duty_cycle = last_duty_cycle - max_duty_cycle_change;
-		fast_accel = 0;
-	}else{
-		fast_accel = 0;
-	}
-		}
-	}
-		if ((armed && running) && input > 47){
+		if ((armed && running) && input >= 47){
 			if(VARIABLE_PWM){
 				tim1_arr = map(commutation_interval, 96, 200, TIMER1_MAX_ARR/2, TIMER1_MAX_ARR);
 			}
@@ -1255,7 +1481,8 @@ if(!prop_brake_active){
 				if(prop_brake_active){
 					adjusted_duty_cycle = TIMER1_MAX_ARR - ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR)+1;
 				}else{
-				adjusted_duty_cycle = DEAD_TIME * running;
+			//	adjusted_duty_cycle = DEAD_TIME * running;
+				adjusted_duty_cycle = ((duty_cycle * tim1_arr)/TIMER1_MAX_ARR);
 				}
 	    }
 		last_duty_cycle = duty_cycle;
@@ -1265,25 +1492,21 @@ if(!prop_brake_active){
 	TMR1->c2dt = adjusted_duty_cycle;
 	TMR1->c3dt = adjusted_duty_cycle;		
 	}
-average_interval = e_com_time / 3;
-if(desync_check && zero_crosses > 10){
-//	if(average_interval < last_average_interval){
-//
+//average_interval = e_com_time / 3;
+//if(desync_check && zero_crosses > 10){
+//		if((getAbsDif(last_average_interval,average_interval) > average_interval>>1) && (average_interval < 2000)){ //throttle resitricted before zc 20.
+//		zero_crosses = 0;
+//		desync_happened ++;
+//		running = 0;
+//		old_routine = 1;
+//			if(zero_crosses > 100){
+//				average_interval = 5000;
+//			}
+//		last_duty_cycle = min_startup_duty/2;
+//		}
+//		desync_check = 0;
+//	last_average_interval = average_interval;
 //	}
-		if((getAbsDif(last_average_interval,average_interval) > average_interval>>1) && (average_interval < 2000)){ //throttle resitricted before zc 20.
-		zero_crosses = 0;
-		desync_happened ++;
-		running = 0;
-		old_routine = 1;
-			if(zero_crosses > 100){
-				average_interval = 5000;
-			}
-		last_duty_cycle = min_startup_duty/2;
-		}
-		desync_check = 0;
-//	}
-	last_average_interval = average_interval;
-	}
 //#ifndef MCU_F031
 //if(commutation_interval > 400){
 //	   NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
@@ -1296,17 +1519,17 @@ if(desync_check && zero_crosses > 10){
 
 #endif // ndef brushed_mode
 
-if(send_telemetry){
-#ifdef	USE_SERIAL_TELEMETRY
-	  makeTelemPackage(degrees_celsius,
-			           battery_voltage,
-					   actual_current,
-	  				   (uint16_t)consumed_current,
-	  					e_rpm);
-	  send_telem_DMA();
-	  send_telemetry = 0;
-#endif
-	}
+//if(send_telemetry){
+//#ifdef	USE_SERIAL_TELEMETRY
+//	  makeTelemPackage(degrees_celsius,
+//			           battery_voltage,
+//					   actual_current,
+//	  				   (uint16_t)consumed_current,
+//	  					e_rpm);
+//	  send_telem_DMA();
+//	  send_telemetry = 0;
+//#endif
+//	}
 #if defined(FIXED_DUTY_MODE) || defined(FIXED_SPEED_MODE)
 
 //		if(INPUT_PIN_PORT->IDR & INPUT_PIN){
@@ -1321,7 +1544,7 @@ if(send_telemetry){
 	  
 		signaltimeout++;
 	
-		if(signaltimeout > 5000) { // quarter second timeout when armed half second for servo;
+		if(signaltimeout > LOOP_FREQUENCY_HZ>>1) { // half second timeout when armed;
 			if(armed){
 				allOff();
 				armed = 0;
@@ -1342,7 +1565,7 @@ if(send_telemetry){
 				NVIC_SystemReset();
 			}
 
-		if (signaltimeout > 25000){     // 2.5 second
+		if (signaltimeout > LOOP_FREQUENCY_HZ<<1){     // 2 second timeout when not armed
 			allOff();
 			armed = 0;
 			input = 0;
@@ -1658,7 +1881,7 @@ send_LED_RGB(125,0,0);
 WDT->cmd = WDT_CMD_RELOAD;
 
 	  adc_counter++;
-	  if(adc_counter>20){   // for testing adc and telemetry
+	  if(adc_counter>100){   // for testing adc and telemetry
 
 					ADC_raw_temp = ADC_raw_temp - (temperature_offset);
 #ifndef USE_NTC
@@ -1712,123 +1935,163 @@ if(newinput > 2000){
 	newinput = 2000;
 }
 #endif
+if(commutation_interval > 100){
+	   NVIC_SetPriority(IC_DMA_IRQ_NAME, 0);
+	   NVIC_SetPriority(ADC1_CMP_IRQn, 1);
+}else{
+	NVIC_SetPriority(IC_DMA_IRQ_NAME, 1);
+	NVIC_SetPriority(ADC1_CMP_IRQn, 0);
+}
+average_interval = e_com_time / 3;
+if(desync_check && zero_crosses > 10){
+//	if(average_interval < last_average_interval){
+//
+//	}
+		if((getAbsDif(last_average_interval,average_interval) > average_interval>>1) && (average_interval < 2000)){ //throttle resitricted before zc 20.
+		zero_crosses = 0;
+		desync_happened ++;
+		if((!bi_direction) && ((input > 47) || (commutation_interval > 1000))){
+		running = 0;
+		}
+		old_routine = 1;
+			if(zero_crosses > 100){
+				average_interval = 5000;
+			}
+		last_duty_cycle = min_startup_duty/2;
+		}
+		desync_check = 0;
+//	}
+	last_average_interval = average_interval;
+	}
+if(send_telemetry){
+#ifdef	USE_SERIAL_TELEMETRY
+	  makeTelemPackage(degrees_celsius,
+			           battery_voltage,
+					   actual_current,
+	  				   (uint16_t)consumed_current,
+	  					e_rpm);
+	  send_telem_DMA();
+	  send_telemetry = 0;
+#endif
+	}
+	
 	  stuckcounter = 0;
 
-  		  if (bi_direction == 1 && dshot == 0){
-  			  if(RC_CAR_REVERSE){
-  				  if (newinput > (1000 + (servo_dead_band<<1))) {
-  					  if (forward == dir_reversed) {
-  						  adjusted_input = 0;
-  						  if(running){
-  							  prop_brake_active = 1;
-  						  }else{
-  							  forward = 1 - dir_reversed;
-  						  }
-  					  }
-  					  if (prop_brake_active == 0) {
-  						  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
-  					  }
-  				  }
-  				  if (newinput < (1000 -(servo_dead_band<<1))) {
-  					  if (forward == (1 - dir_reversed)) {
-  						  if(running){
-  							  prop_brake_active = 1;
-  						  }else{
-  							  forward = dir_reversed;
-  						  }
-  						  adjusted_input = 0;
+//  		  if (bi_direction == 1 && dshot == 0){
+//  			  if(RC_CAR_REVERSE){
+//  				  if (newinput > (1000 + (servo_dead_band<<1))) {
+//  					  if (forward == dir_reversed) {
+//  						  adjusted_input = 0;
+//  						  if(running){
+//  							  prop_brake_active = 1;
+//  						  }else{
+//  							  forward = 1 - dir_reversed;
+//  						  }
+//  					  }
+//  					  if (prop_brake_active == 0) {
+//  						  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
+//  					  }
+//  				  }
+//  				  if (newinput < (1000 -(servo_dead_band<<1))) {
+//  					  if (forward == (1 - dir_reversed)) {
+//  						  if(running){
+//  							  prop_brake_active = 1;
+//  						  }else{
+//  							  forward = dir_reversed;
+//  						  }
+//  						  adjusted_input = 0;
 
-  					  }
-  					  if (prop_brake_active == 0) {
-  						  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
-  					  }
-  				  }
-
-
-  				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
-  					  adjusted_input = 0;
-  					  prop_brake_active = 0;
-  				  }
-  			  }else{
-  				  if (newinput > (1000 + (servo_dead_band<<1))) {
-  					  if (forward == dir_reversed) {
-  						  if((commutation_interval > reverse_speed_threshold )|| stepper_sine){
-  							  forward = 1 - dir_reversed;
-  							  zero_crosses = 0;
-  							  old_routine = 1;
-  							  maskPhaseInterrupts();
-  							brushed_direction_set = 0;
-  						  }else{
-  							  newinput = 1000;
-  						  }
-  					  }
-  					  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
-  				  }
-  				  if (newinput < (1000 -(servo_dead_band<<1))) {
-  					  if (forward == (1 - dir_reversed)) {
-  						  if((commutation_interval > reverse_speed_threshold) || stepper_sine){
-  							  zero_crosses = 0;
-  							  old_routine = 1;
-  							  forward = dir_reversed;
-  							  maskPhaseInterrupts();
-  							brushed_direction_set = 0;
-  						  }else{
-  							  newinput = 1000;
-
-  						  }
-  					  }
-  					  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
-  				  }
-
- 				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
-  					  adjusted_input = 0;
-  					brushed_direction_set = 0;
-  				  }
-  			  }
- 		  }else if (dshot && bi_direction) {
-  			  if (newinput > 1047) {
-
-  				  if (forward == dir_reversed) {
-  					  if(commutation_interval > reverse_speed_threshold || stepper_sine){
-  						  forward = 1 - dir_reversed;
-  						  zero_crosses = 0;
-  						  old_routine = 1;
-  						  maskPhaseInterrupts();
-  						brushed_direction_set = 0;
-  					  }else{
-  						  newinput = 0;
-
-  					  }
-  				  }
-  				  adjusted_input = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
-
-  			  }
-  			  if (newinput <= 1047  && newinput > 47) {
-  				  //	startcount++;
-
-  				  if (forward == (1 - dir_reversed)) {
-  					  if(commutation_interval > reverse_speed_threshold || stepper_sine){
-  						  zero_crosses = 0;
-  						  old_routine = 1;
-  						  forward = dir_reversed;
-  						  maskPhaseInterrupts();
-  						brushed_direction_set = 0;
-  					  }else{
-  						  newinput = 0;
-
-  					  }
-  				  }
-  				  adjusted_input = ((newinput - 48) * 2 + 47) - reversing_dead_band;
-  			  }
-  			  if ( newinput < 48) {
-  				  adjusted_input = 0;
-  				brushed_direction_set = 0;
-  			  }
+//  					  }
+//  					  if (prop_brake_active == 0) {
+//  						  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
+//  					  }
+//  				  }
 
 
-  		  }else{
-  			  adjusted_input = newinput;
-  		  }
+//  				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
+//  					  adjusted_input = 0;
+//  					  prop_brake_active = 0;
+//  				  }
+//  			  }else{
+//  				  if (newinput > (1000 + (servo_dead_band<<1))) {
+//  					  if (forward == dir_reversed) {
+//  						  if((commutation_interval > reverse_speed_threshold )&& (duty_cycle < 100)){
+//  							  forward = 1 - dir_reversed;
+//  							  zero_crosses = 0;
+//  							  old_routine = 1;
+//  							  maskPhaseInterrupts();
+//  							brushed_direction_set = 0;
+//  						  }else{
+//  							  newinput = 1000;
+//  						  }
+//  					  }
+//  					  adjusted_input = map(newinput, 1000 + (servo_dead_band<<1), 2000, 47, 2047);
+//  				  }
+//  				  if (newinput < (1000 -(servo_dead_band<<1))) {
+//  					  if (forward == (1 - dir_reversed)) {
+//  						  if((commutation_interval > reverse_speed_threshold) && (duty_cycle < 100)){
+//  							  zero_crosses = 0;
+//  							  old_routine = 1;
+//  							  forward = dir_reversed;
+//  							  maskPhaseInterrupts();
+//  							brushed_direction_set = 0;
+//  						  }else{
+//  							  newinput = 1000;
+
+//  						  }
+//  					  }
+//  					  adjusted_input = map(newinput, 0, 1000-(servo_dead_band<<1), 2047, 47);
+//  				  }
+
+// 				  if (newinput >= (1000 - (servo_dead_band << 1)) && newinput <= (1000 + (servo_dead_band <<1))) {
+//  					  adjusted_input = 0;
+//  					brushed_direction_set = 0;
+//  				  }
+//  			  }
+// 		  }else if (dshot && bi_direction) {
+//  			  if (newinput > 1047) {
+
+//  				  if (forward == dir_reversed) {
+//  					  if(commutation_interval > reverse_speed_threshold && (duty_cycle < 100)){
+//  						  forward = 1 - dir_reversed;
+//  						  zero_crosses = 0;
+//  						  old_routine = 1;
+//  						  maskPhaseInterrupts();
+//  						brushed_direction_set = 0;
+//  					  }else{
+//  						  newinput = 0;
+
+//  					  }
+//  				  }
+//  				  adjusted_input = ((newinput - 1048) * 2 + 47) - reversing_dead_band;
+
+//  			  }
+//  			  if (newinput <= 1047  && newinput > 47) {
+//  				  //	startcount++;
+
+//  				  if (forward == (1 - dir_reversed)) {
+//  					  if(commutation_interval > reverse_speed_threshold && (duty_cycle < 100)){
+//  						  zero_crosses = 0;
+//  						  old_routine = 1;
+//  						  forward = dir_reversed;
+//  						  maskPhaseInterrupts();
+//  						brushed_direction_set = 0;
+//  					  }else{
+//  						  newinput = 0;
+
+//  					  }
+//  				  }
+//  				  adjusted_input = ((newinput - 48) * 2 + 47) - reversing_dead_band;
+//  			  }
+//  			  if ( newinput < 48) {
+//  				  adjusted_input = 0;
+//  				brushed_direction_set = 0;
+//  			  }
+
+
+//  		  }else{
+//  			  adjusted_input = newinput;
+//  		  }
 #ifndef BRUSHED_MODE
 
 	 	 if ((zero_crosses > 1000) || (adjusted_input == 0)){
@@ -1859,66 +2122,66 @@ if(newinput > 2000){
  	 	 		bemf_timeout = 10;
  	 	 	 }
  	 	 }
-	  if(bemf_timeout_happened > bemf_timeout * ( 1 + (crawler_mode*100))&& stuck_rotor_protection){
-	 		 allOff();
-	 		 maskPhaseInterrupts();
-	 		 input = 0;
-	 		bemf_timeout_happened = 102;
-#ifdef USE_RGB_LED
-			  GPIOB->BRR = LL_GPIO_PIN_8; // on red
-			  GPIOB->BSRR = LL_GPIO_PIN_5;  //
-			  GPIOB->BSRR = LL_GPIO_PIN_3;
-#endif
-	 	  }else{
-#ifdef FIXED_DUTY_MODE
-  			input = FIXED_DUTY_MODE_POWER * 20;
-#else
-	  	  	if(use_sin_start){
-  				if(adjusted_input < 30){           // dead band ?
-  					input= 0;
-  					}
+//	  if(bemf_timeout_happened > bemf_timeout * ( 1 + (crawler_mode*100))&& stuck_rotor_protection){
+//	 		 allOff();
+//	 		 maskPhaseInterrupts();
+//	 		 input = 0;
+//	 		bemf_timeout_happened = 102;
+//#ifdef USE_RGB_LED
+//			  GPIOB->BRR = LL_GPIO_PIN_8; // on red
+//			  GPIOB->BSRR = LL_GPIO_PIN_5;  //
+//			  GPIOB->BSRR = LL_GPIO_PIN_3;
+//#endif
+//	 	  }else{
+//#ifdef FIXED_DUTY_MODE
+//  			input = FIXED_DUTY_MODE_POWER * 20;
+//#else
+//	  	  	if(use_sin_start){
+//  				if(adjusted_input < 30){           // dead band ?
+//  					input= 0;
+//  					}
 
-  					if(adjusted_input > 30 && adjusted_input < (sine_mode_changeover_thottle_level * 20)){
-  					input= map(adjusted_input, 30 , (sine_mode_changeover_thottle_level * 20) , 47 ,160);
-  					}
-  					if(adjusted_input >= (sine_mode_changeover_thottle_level * 20)){
-  					input = map(adjusted_input , (sine_mode_changeover_thottle_level * 20) ,2000 , 160, 2000);
-  					}
-  				}else{
-  					if(use_speed_control_loop){
-  					  if (drive_by_rpm){
- 						target_e_com_time = 60000000 / map(adjusted_input , 47 ,2047 , MINIMUM_RPM_SPEED_CONTROL, MAXIMUM_RPM_SPEED_CONTROL) / (motor_poles/2);
-  		  				if(adjusted_input < 47){           // dead band ?
-  		  					input= 0;
-  		  					speedPid.error = 0;
-  		  				    input_override = 0;
-  		  				}else{
-  	  						input = (uint16_t)input_override;  // speed control pid override
-  	  						if(input_override > 2047){
-  	  							input = 2047;
-  	  						}
-  	  						if(input_override < 48){
-  	  							input = 48;
-  	  						}
-  		  				}
-					    }else{
+//  					if(adjusted_input > 30 && adjusted_input < (sine_mode_changeover_thottle_level * 20)){
+//  					input= map(adjusted_input, 30 , (sine_mode_changeover_thottle_level * 20) , 47 ,160);
+//  					}
+//  					if(adjusted_input >= (sine_mode_changeover_thottle_level * 20)){
+//  					input = map(adjusted_input , (sine_mode_changeover_thottle_level * 20) ,2000 , 160, 2000);
+//  					}
+//  				}else{
+//  					if(use_speed_control_loop){
+//  					  if (drive_by_rpm){
+// 						target_e_com_time = 60000000 / map(adjusted_input , 47 ,2047 , MINIMUM_RPM_SPEED_CONTROL, MAXIMUM_RPM_SPEED_CONTROL) / (motor_poles/2);
+//  		  				if(adjusted_input < 47){           // dead band ?
+//  		  					input= 0;
+//  		  					speedPid.error = 0;
+//  		  				    input_override = 0;
+//  		  				}else{
+//  	  						input = (uint16_t)input_override;  // speed control pid override
+//  	  						if(input_override > 2047){
+//  	  							input = 2047;
+//  	  						}
+//  	  						if(input_override < 48){
+//  	  							input = 48;
+//  	  						}
+//  		  				}
+//					    }else{
 
-  						input = (uint16_t)input_override;  // speed control pid override
-  						if(input_override > 1999){
-  							input = 1999;
-  						}
-  						if(input_override < 48){
-  							input = 48;
-  						}
-					    }
-  					}else{
+//  						input = (uint16_t)input_override;  // speed control pid override
+//  						if(input_override > 1999){
+//  							input = 1999;
+//  						}
+//  						if(input_override < 48){
+//  							input = 48;
+//  						}
+//					    }
+//  					}else{
 
-  						input = adjusted_input;
+//  						input = adjusted_input;
 
-  					}
-  				}
-#endif
-	 	  }
+//  					}
+//  				}
+//#endif
+//	 	  }
 		  if ( stepper_sine == 0){
 
   e_rpm = running * (600000/ e_com_time);       // in tens of rpm
@@ -1982,6 +2245,8 @@ if (old_routine && running){
 	 		  old_routine = 1;
 	 		  if(input < 48){
 	 		   running = 0;
+				 commutation_interval = 4000;
+		 		 average_interval = 4000;
 	 		  }
 	 		   zero_crosses = 0;
 	 		   zcfoundroutine();

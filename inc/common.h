@@ -22,7 +22,7 @@ extern uint32_t current_EXTI_LINE;
 extern char dshot_extended_telemetry;
 extern uint16_t send_extended_dshot;
 extern uint8_t buffer_padding;
-
+extern uint8_t compute_dshot_flag;
 extern uint16_t comp_change_time;
 extern uint16_t interrupt_time;
 

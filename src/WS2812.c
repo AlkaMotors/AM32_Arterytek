@@ -8,7 +8,9 @@
 #include "WS2812.h"
 #include "targets.h"
 #include "functions.h"
-									
+
+#ifdef USE_WS2812
+
 void waitClockCycles(uint16_t cycles){
 	UTILITY_TIMER->cval = 0;
 	while (UTILITY_TIMER->cval < cycles){
@@ -32,9 +34,9 @@ void waitClockCycles(uint16_t cycles){
 //}
 
 void sendBit(uint8_t inbit){
- 	GPIOB->scr = GPIO_PINS_7; 
+ 	GPIOB->scr = WS2812_PIN; 
 	waitClockCycles(CPU_FREQUENCY_MHZ>>(2-inbit));
-	GPIOB->clr = GPIO_PINS_7; 
+	GPIOB->clr = WS2812_PIN; 
 	waitClockCycles(CPU_FREQUENCY_MHZ>>(1+inbit)); 
 }
 											
@@ -46,7 +48,7 @@ __disable_irq();
   for(int i = 0; i < 24 ; i ++){
 	  sendBit((twenty_four_bit_color_number >> (23 - i))&1);
   }
-  GPIOB->clr = GPIO_PINS_7;
+  GPIOB->clr = WS2812_PIN;
   UTILITY_TIMER->div = CPU_FREQUENCY_MHZ;
   UTILITY_TIMER->swevt |= TMR_OVERFLOW_SWTRIG;
 __enable_irq();
@@ -54,5 +56,7 @@ __enable_irq();
 
 void WS2812_Init(void)
 {	
-	gpio_mode_QUICK(GPIOB, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, GPIO_PINS_7);
+	gpio_mode_QUICK(GPIOB, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, WS2812_PIN);
 }
+
+#endif

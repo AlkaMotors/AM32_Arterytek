@@ -18,6 +18,7 @@ extern char servoPwm;
 #include "main.h"
 #include "targets.h"
 #include "adc.h"
+#include "IO.h"
 /** @addtogroup AT32F421_StdPeriph_Templates
   * @{
   */
@@ -153,6 +154,8 @@ void DMA1_Channel3_2_IRQHandler(void)
 
 void DMA1_Channel5_4_IRQHandler(void)
 {
+	
+	
 #ifdef USE_TIMER_15_CHANNEL_1
 	if(dma_flag_get(DMA1_HDT5_FLAG) == SET){
 			if(servoPwm){
@@ -166,7 +169,7 @@ void DMA1_Channel5_4_IRQHandler(void)
       DMA1->clr = DMA1_GL5_FLAG;
 			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
 		  transfercomplete();
-
+      TMR14->cval = TMR14->pr -2;
 		  }
 		   if(dma_flag_get(DMA1_DTERR5_FLAG) == SET)
 		  {
@@ -186,13 +189,14 @@ void DMA1_Channel5_4_IRQHandler(void)
       DMA1->clr = DMA1_GL4_FLAG;
 			INPUT_DMA_CHANNEL->ctrl_bit.chen = FALSE;
 		  transfercomplete();
-
+      TMR14->cval = TMR14->pr -2;
 		  }
 		   if(dma_flag_get(DMA1_DTERR4_FLAG) == SET)
 		  {
 				DMA1->clr = DMA1_GL4_FLAG;
 			}
 #endif
+			
 }
 
 /**
@@ -228,8 +232,9 @@ void TMR16_GLOBAL_IRQHandler(void)
 void TMR15_GLOBAL_IRQHandler(void)
 {
 	TMR15->ists = (uint16_t)~TMR_OVF_FLAG;
-	TMR15->ists = (uint16_t)~TMR_C1_FLAG;
-
+  TMR15->iden &= ~TMR_OVF_INT;
+//	sendDshotDma();
+//	IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
 }
 
 
@@ -244,14 +249,10 @@ void USART1_IRQHandler(void)
 
 void TMR3_GLOBAL_IRQHandler(void)
 {
-			if((TMR3->ists & TMR_C1_FLAG) != (uint16_t)RESET)
-	  {
-			TMR3->ists = (uint16_t)~TMR_C1_FLAG;
-	  }
-		if((TMR3->ists & TMR_OVF_FLAG) != (uint16_t)RESET)
-	  {
-			TMR3->ists = (uint16_t)~TMR_OVF_FLAG;
-	  }  
+//	COM_TIMER->iden &= ~TMR_OVF_INT; // disable interrupt    
+		TMR3->ists = (uint16_t)~TMR_C1_FLAG;
+		TMR3->ists = (uint16_t)~TMR_OVF_FLAG; 
+	//
 }
 
 

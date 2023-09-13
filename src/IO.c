@@ -12,9 +12,9 @@
 #include "functions.h"
 #include "common.h"
 
-char ic_timer_prescaler = CPU_FREQUENCY_MHZ / 8 - 1;
+char ic_timer_prescaler = CPU_FREQUENCY_MHZ/15;
 char output_timer_prescaler;
-int buffersize = 32;
+int buffersize = 64;
 int smallestnumber = 0;
 uint32_t dma_buffer[64] = {0};
 char out_put = 0;
@@ -41,7 +41,7 @@ gpio_mode_QUICK(GPIOB, GPIO_MODE_INPUT, GPIO_PULL_UP, INPUT_PIN);
 #endif
 	INPUT_DMA_CHANNEL->ctrl |= DMA_DIR_PERIPHERAL_TO_MEMORY;
 	tmr_reset(IC_TIMER_REGISTER);
-	IC_TIMER_REGISTER->cm1 = 0x6001;
+	IC_TIMER_REGISTER->cm1 = 0x7001;
 	IC_TIMER_REGISTER->cctrl = 0xB;
 	IC_TIMER_REGISTER->div = ic_timer_prescaler;
 	IC_TIMER_REGISTER->pr = 0xFFFF;
@@ -82,31 +82,31 @@ gpio_mode_QUICK(INPUT_PIN_PORT, GPIO_MODE_MUX, GPIO_PULL_NONE, INPUT_PIN);
 }
 	
 void checkDshot(){
-		if ((smallestnumber >= 0)&&(smallestnumber < 2)&& (average_signal_pulse < 3)) {
+		if ((smallestnumber >= 0)&&(smallestnumber < 2)) {
 		ic_timer_prescaler= 1;
 		output_timer_prescaler=0;
 		dshot = 1;
-		buffer_divider = 44;
-		dshot_runout_timer = 65000;
 		buffersize = 32;
+			inputSet = 1;
 	}
-	if ((smallestnumber >= 2)&&(smallestnumber < 4)&& (average_signal_pulse < 4)) {
+	if ((smallestnumber >= 2)&&(smallestnumber < 5)&& (average_signal_pulse < 8)) {
 			ic_timer_prescaler= 3;
 			output_timer_prescaler=0;
 			dshot = 1;
 			buffersize = 32;
+		inputSet = 1;
 		}
 	
 
-	if ((smallestnumber >= 4)&&(smallestnumber < 6)&& (average_signal_pulse < 8)) {
+	if ((smallestnumber >= 5)&&(smallestnumber < 8)&& (average_signal_pulse < 16)) {
 		ic_timer_prescaler= 7;
 		output_timer_prescaler=1;
 		dshot = 1;
-		buffer_padding = 18;
+		buffer_padding = 17;
 		buffersize = 32;
 		inputSet = 1;
 	}
-	if ((smallestnumber >= 8 )&&(smallestnumber < 10)&& (average_signal_pulse < 20)){
+	if ((smallestnumber >= 8 )&&(smallestnumber < 16)&& (average_signal_pulse < 30)){
 		dshot = 1;
 		ic_timer_prescaler=15;
 		output_timer_prescaler=3;
@@ -147,7 +147,7 @@ void detectInput(){
 		lastnumber = dma_buffer[j];
 	}
 	average_signal_pulse = average_signal_pulse/32 ;
-	
+	UTILITY_TIMER->c1dt = smallestnumber;
 if(dshot == 1){
  checkDshot();
 }

@@ -107,19 +107,26 @@ void computeServoInput(){
 
 void transfercomplete(){
 	if(armed && dshot_telemetry){
-	    if(out_put){
-			receiveDshotDma();
-			make_dshot_package();	
+		    if(out_put){
+	//		changeToInput();		
+    // 	  receiveDshotDma();
+        compute_dshot_flag = 2;
+     //	make_dshot_package();
 	   	return;
 	    }else{
-			sendDshotDma();
-			computeDshotDMA();
+		//		TMR15->cval = 1;
+		//		TMR15->ists = (uint16_t)~TMR_OVF_FLAG;
+		//		TMR15->iden |= TMR_OVF_INT;
+        sendDshotDma();
+        compute_dshot_flag = 1;
+
 	    return;
 	    }
 	}
 
 	  if (inputSet == 0){
 	 	 detectInput();
+	
 	 	receiveDshotDma();
 	 return;
 	  }
@@ -133,19 +140,20 @@ if(dshot_telemetry){
 //    	TIM17->CNT = 0;
     	make_dshot_package();          // this takes around 10us !!
   	computeDshotDMA();             //this is slow too..
+		
   	receiveDshotDma();             //holy smokes.. reverse the line and set up dma again
    	return;
     }else{
+		
 		sendDshotDma();
+		//	IC_TIMER_REGISTER->ctrl1_bit.tmren = TRUE;
     return;
     }
 }else{
 
 		if (dshot == 1){
 			computeDshotDMA();
-			if(send_telemetry){
-            // done in 10khz routine
-			}
+			
 			receiveDshotDma();
 		}
 		if  (servoPwm == 1){
@@ -155,9 +163,10 @@ if(dshot_telemetry){
 	 
 			computeServoInput();
 			}	  
-        IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_RISING_EDGE;
-   		receiveDshotDma();
-		INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
+     IC_TIMER_REGISTER->cctrl_bit.c1p = TMR_INPUT_RISING_EDGE;
+		
+   	receiveDshotDma();
+		 INPUT_DMA_CHANNEL->ctrl |= DMA_HDT_INT;
 		}
 
 	}

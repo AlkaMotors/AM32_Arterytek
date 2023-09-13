@@ -59,9 +59,10 @@ void computeDshotDMA(){
 
 int j = 0;
 dshot_frametime = dma_buffer[31]- dma_buffer[0];
-////UTILITY_TIMER->c1dt = dshot_frametime;
 halfpulsetime = (dshot_frametime >> 5) + (dshot_frametime >> 8);
-if((dshot_frametime < 500)&&(dshot_frametime > 300)){
+//UTILITY_TIMER->c1dt = dshot_frametime;	
+	
+if((dshot_frametime < 500)&&(dshot_frametime > 100)){
 for (int i = 0; i < 16; i++){
 	dpulse[i] = ((dma_buffer[j + (i<<1) +1] - dma_buffer[j + (i<<1)]) > (halfpulsetime)) ;
 }	
@@ -152,15 +153,20 @@ for (int i = 0; i < 16; i++){
 					if(command_count >= 6){
 						command_count = 0;
 					switch (dshotcommand){                   // todo
-
 					case 1:
-						playInputTune();
+						play_tone_flag = 1;
 					break;
 					case 2:
-						playInputTune2();
+						play_tone_flag = 2;
      			    break;
 					case 3:
-						playBeaconTune3();
+						play_tone_flag = 3;
+					break;
+					case 4:
+						play_tone_flag = 4;
+					break;
+					case 5:
+						play_tone_flag = 5;
 					break;
 					case 7:
 						dir_reversed = 0;
@@ -217,7 +223,7 @@ for (int i = 0; i < 16; i++){
 			}else{
 				dshot_badcounts++;
 			}
-	//	UTILITY_TIMER->c1dt = dshot_badcounts;
+		
 }
 
 
@@ -226,7 +232,7 @@ if(send_extended_dshot > 0){
   dshot_full_number = send_extended_dshot;
   send_extended_dshot = 0;
 }else{
-  if (!running || e_com_time > 65535){
+  if (!running || (e_com_time > 65535)){
 	  e_com_time = 65535;
   }
 //	calculate shift amount for data in format eee mmm mmm mmm, first 1 found in first seven bits of data determines shift amount
@@ -264,9 +270,9 @@ for (int i = 15; i >= 9 ; i--){
 //GCR RLL encode 20 to 21bit output
 
 #ifdef MCU_AT421
-		  gcr[1+buffer_padding] = 78;
+		  gcr[1+buffer_padding] = 128;
 		  for( int i= 19; i >= 0; i--){              // each digit in gcrnumber
-			  gcr[buffer_padding+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[buffer_padding+20-i]>>6)) *78;        // exclusive ored with number before it multiplied by 64 to match output timer.
+			  gcr[buffer_padding+20-i+1] = ((((gcrnumber &  1 << i )) >> i) ^ (gcr[buffer_padding+20-i]>>7)) <<7;        // exclusive ored with number before it multiplied by 64 to match output timer.
 		  }
           gcr[buffer_padding] = 0;
 #endif

@@ -40,7 +40,7 @@
 #ifdef  F4A_AIO_F421
 #define FIRMWARE_NAME           "F4A AIO     "
 #define FILE_NAME                "F4A_AIO_F421"
-#define DEAD_TIME               20
+#define DEAD_TIME               25
 #define HARDWARE_GROUP_AT_540
 #define HARDWARE_GROUP_AT_F
 //#define USE_SERIAL_TELEMETRY
@@ -88,6 +88,45 @@
 #define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
+
+#ifdef PIONEER_50A_F421
+#define FIRMWARE_NAME           "Pioneer 50A "
+#define FILE_NAME                "PIONEER_50A_F421"
+#define DEAD_TIME               60
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef PIONEER_35A_F421
+#define FIRMWARE_NAME           "Pioneer 35A "
+#define FILE_NAME                "PIONEER_35A_F421"
+#define DEAD_TIME               40
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+#ifdef PIONEER_25A_F421
+#define FIRMWARE_NAME           "Pioneer 25A "
+#define FILE_NAME                "PIONEER_25A_F421"
+#define DEAD_TIME               40
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
+
+
+#ifdef  NEUTRON_2_6S_AIO_F421
+#define FIRMWARE_NAME           "Neutron AIO"
+#define FILE_NAME                "NEUTRON_2_6S_AIO"
+#define DEAD_TIME               40
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
+#define USE_SERIAL_TELEMETRY
+#endif
+
 
 #ifdef DARWIN_F421
 #define FIRMWARE_NAME           "DARWIN F421 "
@@ -145,8 +184,18 @@
 #define FIRMWARE_NAME           "Tekko32 F4  "
 #define FILE_NAME                "TEKKO32_F421"
 #define DEAD_TIME               80
-#define HARDWARE_GROUP_AT_A
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
+#define TARGET_VOLTAGE_DIVIDER  	 110
+#define MILLIVOLT_PER_AMP          40
+#define CURRENT_OFFSET            0          // mv
+//#define MAX_LOW_RPM_CHANGE        1
+//#define MAX_HIGH_RPM_CHANGE 			1
+#define LOOP_FREQUENCY_HZ   4000
+#define USE_WS2812
+#define WS2812_PIN GPIO_PINS_8
+#define BEEP_RAMP_DEBUG
 #endif
 
 #ifdef HAKRC_G_F421                                     
@@ -170,6 +219,7 @@
 #define CURRENT_OFFSET            505          // mv
 #define USE_NTC
 #define USE_WS2812
+#define WS2812_PIN GPIO_PINS_7
 #define ADC_CHANNEL_CURRENT  ADC_CHANNEL_3
 #define ADC_CHANNEL_VOLTAGE  ADC_CHANNEL_2
 #define ADC_CHANNEL_TEMP     ADC_CHANNEL_6
@@ -188,11 +238,28 @@
 #define HARDWARE_GROUP_AT_C
 #define FIRMWARE_NAME           "FOXEER F4   "
 #define FILE_NAME                "FOXEER_F421"
-#define DEAD_TIME               60
+#define DEAD_TIME               40
 #define HARDWARE_GROUP_AT_540
 #define USE_SERIAL_TELEMETRY
 #endif
 
+#ifdef  NEUTRON_1_2S_MINI_F421
+#define FIRMWARE_NAME           "Neutron Mini"
+#define FILE_NAME                "NEUTRON_1_2S_MINI_F421"
+#define DEAD_TIME               90
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_C
+#define USE_INVERTED_HIGH
+#endif
+
+#ifdef  TBS_MINI_F421
+#define FIRMWARE_NAME           "TBS Mini"
+#define FILE_NAME                "TBS_MINI_F421"
+#define DEAD_TIME               120
+#define HARDWARE_GROUP_AT_045
+#define HARDWARE_GROUP_AT_B
+#define USE_INVERTED_HIGH
+#endif
 
 #ifdef  WRAITH32_F421
 #define FIRMWARE_NAME           "WRAITH32_F4  "
@@ -220,7 +287,8 @@
 #define FIRMWARE_NAME           "AIKON S F4  "
 #define FILE_NAME                "AIKON_SINGLE_F421"
 #define DEAD_TIME               60
-#define HARDWARE_GROUP_AT_A
+#define HARDWARE_GROUP_AT_B
+#define HARDWARE_GROUP_AT_045
 #define USE_SERIAL_TELEMETRY
 #endif
 
@@ -246,27 +314,6 @@
 #define DEAD_TIME               100
 #define HARDWARE_GROUP_AT_D
 #define USE_SERIAL_TELEMETRY
-#endif
-/********************************** defaults if not set ***************************/
-
-#ifndef 	TARGET_VOLTAGE_DIVIDER
-#define 	TARGET_VOLTAGE_DIVIDER  	110
-#endif
-
-#ifndef 	SINE_DIVIDER
-#define 	SINE_DIVIDER 				2
-#endif
-
-#ifndef  	MILLIVOLT_PER_AMP
-#define   MILLIVOLT_PER_AMP           20
-#endif 
-
-#ifndef 	  CURRENT_OFFSET
-#define     CURRENT_OFFSET              0
-#endif
-
-#ifndef TARGET_STALL_PROTECTION_INTERVAL
-#define TARGET_STALL_PROTECTION_INTERVAL 6500
 #endif
 
 
@@ -424,9 +471,6 @@
 #endif
 
 
-
-
-
 #ifdef HARDWARE_GROUP_AT_F
 
 #define MCU_AT421
@@ -505,7 +549,7 @@
 
 
 
-/**************************************DEFAULT ADC INPUTS *************************************************/
+/**************************************DEFAULTS *************************************************/
 #ifndef ADC_CHANNEL_CURRENT
 #define ADC_CHANNEL_CURRENT  ADC_CHANNEL_6
 #endif
@@ -517,6 +561,38 @@
 #define ADC_CHANNEL_TEMP     ADC_CHANNEL_16
 #endif
 
+#ifndef LOOP_FREQUENCY_HZ
+#define LOOP_FREQUENCY_HZ  20000
+#endif
+
+
+#ifndef MAX_LOW_RPM_CHANGE
+#define MAX_LOW_RPM_CHANGE 8
+#endif
+
+#ifndef MAX_HIGH_RPM_CHANGE
+#define MAX_HIGH_RPM_CHANGE 24
+#endif
+
+#ifndef 	TARGET_VOLTAGE_DIVIDER
+#define 	TARGET_VOLTAGE_DIVIDER  	110
+#endif
+
+#ifndef 	SINE_DIVIDER
+#define 	SINE_DIVIDER 				2
+#endif
+
+#ifndef  	MILLIVOLT_PER_AMP
+#define   MILLIVOLT_PER_AMP           20
+#endif 
+
+#ifndef 	  CURRENT_OFFSET
+#define     CURRENT_OFFSET              0
+#endif
+
+#ifndef TARGET_STALL_PROTECTION_INTERVAL
+#define TARGET_STALL_PROTECTION_INTERVAL 6500
+#endif
 
 
 

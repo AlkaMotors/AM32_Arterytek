@@ -8,7 +8,6 @@
 #include "targets.h"
 #include "functions.h"
 
-
 extern char comp_pwm;
 extern char prop_brake_active;
 
@@ -16,26 +15,19 @@ extern char prop_brake_active;
 
 #ifdef USE_INVERTED_LOW
 	#pragma message ("using inverted low side output")
-	#define LOW_BITREG_ON  BRR
-	#define LOW_BITREG_OFF BSRR
+	#define LOW_BITREG_ON  clr
+	#define LOW_BITREG_OFF scr
 #else
-	#define LOW_BITREG_ON  BSRR
-	#define LOW_BITREG_OFF BRR
+	#define LOW_BITREG_ON  scr
+	#define LOW_BITREG_OFF clr
 #endif
 
 #ifdef USE_INVERTED_HIGH
 	#pragma message ("using inverted high side output")
-	//#define HIGH_BITREG_ON  BRR
-	#define HIGH_BITREG_OFF BSRR
+	#define HIGH_BITREG_OFF scr
 #else
-	//#define HIGH_BITREG_ON  BSRR
-	#define HIGH_BITREG_OFF BRR
+	#define HIGH_BITREG_OFF clr
 #endif
-
-//void gpio_mode_QUICK(GPIO_Type* gpio_periph, uint32_t mode, uint32_t pull_up_down, uint32_t pin){
-//gpio_periph->MODER = (((((gpio_periph->MODER))) & (~(((pin * pin) * (0x3UL << (0U)))))) | (((pin * pin) * mode)));
-//}
-
 
 void proportionalBrake(){  // alternate all channels between braking (ABC LOW) and coasting (ABC float)
 	                        // put lower channel into alternate mode and turn upper OFF for each channel
@@ -43,13 +35,13 @@ void proportionalBrake(){  // alternate all channels between braking (ABC LOW) a
 
 //	gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
  gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
- PHASE_A_GPIO_PORT_HIGH->clr = PHASE_A_GPIO_HIGH;
+ PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_A_GPIO_HIGH;
 
 	gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
-	PHASE_B_GPIO_PORT_HIGH->clr = PHASE_B_GPIO_HIGH;
+	PHASE_B_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_B_GPIO_HIGH;
 
 	gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
-	PHASE_C_GPIO_PORT_HIGH->clr = PHASE_C_GPIO_HIGH;
+	PHASE_C_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_C_GPIO_HIGH;
 
 
 	// set low channel to PWM, duty cycle will now control braking
@@ -61,7 +53,7 @@ void proportionalBrake(){  // alternate all channels between braking (ABC LOW) a
 //void phaseCPWM() {
 //	if (!comp_pwm){
 //			gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
-//			PHASE_C_GPIO_PORT_LOW->clr = PHASE_C_GPIO_LOW;
+//			PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
 //		gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
 //		}else{
 //		  TMR_CCxCmd(TMR1, TMR_Channel_3, TMR_CCx_Enable);
@@ -89,7 +81,7 @@ void proportionalBrake(){  // alternate all channels between braking (ABC LOW) a
 void phaseBPWM() {
 		if(!comp_pwm){          
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-		PHASE_B_GPIO_PORT_LOW->clr = PHASE_B_GPIO_LOW;
+		PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
 		}else{
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_B_GPIO_LOW); // low
 		}
@@ -98,16 +90,16 @@ void phaseBPWM() {
 }
 void phaseBFLOAT() {
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-		PHASE_B_GPIO_PORT_LOW->clr = PHASE_B_GPIO_LOW;
+		PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
-		PHASE_B_GPIO_PORT_HIGH->clr = PHASE_B_GPIO_HIGH;
+		PHASE_B_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_B_GPIO_HIGH;
 	}
 void phaseBLOW() {
 	        // low mosfet on
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-		PHASE_B_GPIO_PORT_LOW->scr = PHASE_B_GPIO_LOW;
+		PHASE_B_GPIO_PORT_LOW->LOW_BITREG_ON = PHASE_B_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_B_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_HIGH);
-		PHASE_B_GPIO_PORT_HIGH->clr = PHASE_B_GPIO_HIGH;
+		PHASE_B_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_B_GPIO_HIGH;
 }
 
 //////////////////////////////PHASE 2//////////////////////////////////////////////////
@@ -116,7 +108,7 @@ void phaseBLOW() {
 void phaseCPWM() {
 	if (!comp_pwm){
 			gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
-			PHASE_C_GPIO_PORT_LOW->clr = PHASE_C_GPIO_LOW;
+			PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
 		}else{
 		gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);;
 		}
@@ -128,18 +120,18 @@ void phaseCPWM() {
 void phaseCFLOAT() {
 	         // floating
 		gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
-		PHASE_C_GPIO_PORT_LOW->clr = PHASE_C_GPIO_LOW;
+		PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
-		PHASE_C_GPIO_PORT_HIGH->clr = PHASE_C_GPIO_HIGH;
+		PHASE_C_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_C_GPIO_HIGH;
 	}
 
 
 
 void phaseCLOW() {
 		gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
-		PHASE_C_GPIO_PORT_LOW->scr = PHASE_C_GPIO_LOW;
+		PHASE_C_GPIO_PORT_LOW->LOW_BITREG_ON = PHASE_C_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_C_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_HIGH);
-		PHASE_C_GPIO_PORT_HIGH->clr = PHASE_C_GPIO_HIGH;
+		PHASE_C_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_C_GPIO_HIGH;
 	}
 
 
@@ -149,7 +141,7 @@ void phaseCLOW() {
 void phaseAPWM() {
 		if (!comp_pwm){
 			gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-			PHASE_A_GPIO_PORT_LOW->clr = PHASE_A_GPIO_LOW;
+			PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW;
 			}else{
 		gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_MUX, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
 			}
@@ -158,16 +150,16 @@ void phaseAPWM() {
 
 void phaseAFLOAT() {
 		gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-		PHASE_A_GPIO_PORT_LOW->clr = PHASE_A_GPIO_LOW;
+		PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
-		PHASE_A_GPIO_PORT_HIGH->clr = PHASE_A_GPIO_HIGH;
+		PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_A_GPIO_HIGH;
 	}
 
 void phaseALOW() {
 		gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-		PHASE_A_GPIO_PORT_LOW->scr = PHASE_A_GPIO_LOW;
+		PHASE_A_GPIO_PORT_LOW->LOW_BITREG_ON = PHASE_A_GPIO_LOW;
 		gpio_mode_QUICK(PHASE_A_GPIO_PORT_HIGH, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_HIGH);
-		PHASE_A_GPIO_PORT_HIGH->clr = PHASE_A_GPIO_HIGH;
+		PHASE_A_GPIO_PORT_HIGH->HIGH_BITREG_OFF = PHASE_A_GPIO_HIGH;
 	}
 
 #else
@@ -176,7 +168,7 @@ void phaseALOW() {
 void phaseBPWM() {
 		if(!comp_pwm){            // for future
 		//gpio_mode_QUICK(PHASE_B_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_B_GPIO_LOW);
-		//PHASE_B_GPIO_PORT_LOW->clr = PHASE_B_GPIO_LOW;
+		//PHASE_B_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_B_GPIO_LOW;
 		}else{
 		LL_GPIO_SetPinMode(PHASE_B_GPIO_PORT_ENABLE, PHASE_B_GPIO_ENABLE, LL_GPIO_MODE_OUTPUT); // enable on
 		PHASE_B_GPIO_PORT_ENABLE->BSRR = PHASE_B_GPIO_ENABLE;
@@ -210,7 +202,7 @@ void phaseBLOW() {
 void phaseCPWM() {
 	if (!comp_pwm){
 		//	gpio_mode_QUICK(PHASE_C_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_C_GPIO_LOW);
-			//PHASE_C_GPIO_PORT_LOW->clr = PHASE_C_GPIO_LOW;
+			//PHASE_C_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_C_GPIO_LOW;
 		}else{
 			LL_GPIO_SetPinMode(PHASE_C_GPIO_PORT_ENABLE, PHASE_C_GPIO_ENABLE, LL_GPIO_MODE_OUTPUT);  // enable on
 			PHASE_C_GPIO_PORT_ENABLE->BSRR = PHASE_C_GPIO_ENABLE;
@@ -244,7 +236,7 @@ void phaseCLOW() {
 void phaseAPWM() {
 		if (!comp_pwm){
 		//	gpio_mode_QUICK(PHASE_A_GPIO_PORT_LOW, GPIO_MODE_OUTPUT, GPIO_PULL_NONE, PHASE_A_GPIO_LOW);
-			//PHASE_A_GPIO_PORT_LOW->clr = PHASE_A_GPIO_LOW;
+			//PHASE_A_GPIO_PORT_LOW->LOW_BITREG_OFF = PHASE_A_GPIO_LOW;
 			}else{
 				LL_GPIO_SetPinMode(PHASE_A_GPIO_PORT_ENABLE, PHASE_A_GPIO_ENABLE, LL_GPIO_MODE_OUTPUT);  // enable on
 				PHASE_A_GPIO_PORT_ENABLE->BSRR = PHASE_A_GPIO_ENABLE;
@@ -354,4 +346,3 @@ phaseALOW();
 phaseBPWM();
 phaseCLOW();
 }
-
